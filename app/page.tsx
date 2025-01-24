@@ -2,30 +2,23 @@ import { NavigationMenuDemo } from "@/components/ui/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import ButtonWithModal from "@/components/ui/button-with-modal";
+import NavbarNew from "@/components/ui/navbar-new";
+import Features from "@/components/ui/features";
+import Hero from "@/components/ui/hero";
 
 export default function Home() {
-  const navbar = [];
-
   return (
     <main>
-      <div className="flex justify-between ">
-        {/* <Image></Image> */}
-        <NavigationMenuDemo />
-        <div className="items-end m-5 ">
-          <Button className="px-10" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
+      <NavbarNew />
+      <Hero/>
+      {/* <!-- Features Section --> */}
+      <Features/>
+      <footer className="bg-gray-800 text-white py-6">
+        <div className="container mx-auto px-4 text-center">
+          <p>&copy; 2025 Capella. All rights reserved.</p>
         </div>
-      </div>
-      <div className="flex">
-        <div className="w-1/2 p-40">
-        <div className="text-blue-600 text-6xl font-bold">Be Smart In Managing Housing Society Online</div>
-        <div>We help to provide services like instant maintenance bill generation, smart notification through mobile apps, pay maintenance bills by CC / DC / NB, Alert reminder on outstanding dues, Instant notices & circulars, fully integrated accounting system with automated trial balance</div>
-        </div>
-        <div className="w-1/2">
-          <img src="./landing/image.png" alt="hero"></img>
-        </div>
-      </div>
+      </footer>
     </main>
   );
 }
