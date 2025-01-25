@@ -36,18 +36,21 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useState } from "react"
 
 const menuItems = [
-  { icon: Home, label: "Dashboard", href: "/dashboard", subItems: [
-    { icon: LineChart, label: "Overview", href: "/analytics/overview" },
-    { icon: PieChart, label: "Activity log", href: "/analytics/activity" },
+  { icon: Home, label: "Dashboard", href: "./dashboard"
+    // ,subItems: [
+    // { icon: LineChart, label: "Overview", href: "/analytics/overview" },
+    // { icon: PieChart, label: "Activity log", href: "/analytics/activity" },
     // { icon: BarChart, label: "Performance", href: "/analytics/performance" },
-  ], },
+  // ],
+ },
   {
     icon: BarChart2,
-    label: "Analytics",
+    label: "Society Control",
     subItems: [
-      { icon: LineChart, label: "Overview", href: "/analytics/overview" },
-      { icon: PieChart, label: "Demographics", href: "/analytics/demographics" },
-      { icon: BarChart, label: "Performance", href: "/analytics/performance" },
+      { icon: LineChart, label: "Society Details", href: "./details" },
+      { icon: PieChart, label: "Committee Members", href: "./committee" },
+      { icon: BarChart, label: "Members", href: "./members" }
+      // { icon: BarChart, label: "Performance", href: "/analytics/performance" },
     ],
   },
   { icon: Users, label: "Customers", href: "/customers" },
@@ -73,19 +76,19 @@ export function DashboardSidebar() {
     <Sidebar>
       <SidebarHeader className="px-4 py-2">
         <div className="bg-primary rounded-xl py-5 flex items-center justify-center">
-      <img src="./landing/logo.png" alt="logo" className="w-1/2"/>
+      <img src="/landing/logo.png" alt="logo" className="w-1/2"/>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
           {menuItems.map((item) => (
-            <SidebarMenuItem key={item.label}>
+            <SidebarMenuItem key={item.label} >
               {item.subItems ? (
                 <Collapsible open={openItems.includes(item.label)} onOpenChange={() => toggleItem(item.label)}>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="w-full justify-between">
-                      <div className="flex items-center">
-                        <item.icon className="h-4 w-4 mr-2" />
+                    <SidebarMenuButton className="w-full justify-between hover:bg-gray-300">
+                      <div className="flex items-center ">
+                        <item.icon className="h-4 w-4 mr-2 " />
                         <span>{item.label}</span>
                       </div>
                       <ChevronDown
@@ -95,7 +98,7 @@ export function DashboardSidebar() {
                   </CollapsibleTrigger>
                   <CollapsibleContent className="pl-6 mt-1">
                     {item.subItems.map((subItem) => (
-                      <SidebarMenuButton key={subItem.label} asChild className="w-full justify-start">
+                      <SidebarMenuButton key={subItem.label} asChild className="w-full justify-start hover:bg-gray-300">
                         <a href={subItem.href}>
                           <subItem.icon className="h-4 w-4 mr-2" />
                           <span>{subItem.label}</span>
@@ -106,7 +109,7 @@ export function DashboardSidebar() {
                 </Collapsible>
               ) : (
                 <SidebarMenuButton asChild>
-                  <a href={item.href}>
+                  <a href={item.href} className="hover:bg-gray-300">
                     <item.icon className="h-4 w-4 mr-2" />
                     <span>{item.label}</span>
                   </a>

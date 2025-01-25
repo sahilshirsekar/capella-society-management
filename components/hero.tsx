@@ -1,4 +1,4 @@
-import ButtonWithModal from "./button-with-modal";
+import ButtonWithModal from "./ui/button-with-modal";
 
 export default function Hero(){
   return(

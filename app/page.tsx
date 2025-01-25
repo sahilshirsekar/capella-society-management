@@ -4,8 +4,8 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import ButtonWithModal from "@/components/ui/button-with-modal";
 import NavbarNew from "@/components/ui/navbar-new";
-import Features from "@/components/ui/features";
-import Hero from "@/components/ui/hero";
+import Features from "@/components/features";
+import Hero from "@/components/hero";
 
 export default function Home() {
   return (

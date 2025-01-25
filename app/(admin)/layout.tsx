@@ -1,7 +1,7 @@
 import "@/app/globals.css"
 import { Inter } from "next/font/google"
 import { SidebarProvider } from "@/components/ui/sidebar"
-import { DashboardLayout } from "@/components/ui/dashboard-layout"
+import { DashboardLayout } from "@/components/dashboard-layout"
 
 const inter = Inter({ subsets: ["latin"] })
 
