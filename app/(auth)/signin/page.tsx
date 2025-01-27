@@ -1,6 +1,7 @@
-import { GalleryVerticalEnd } from "lucide-react"
+import { GalleryVerticalEnd } from "lucide-react";
 
-import { LoginForm } from "@/components/ui/login-form"
+import { LoginForm } from "@/components/ui/login-form";
+import SignInForm from "@/components/form/signin";
 
 export default function LoginPage() {
   return (
@@ -9,21 +10,21 @@ export default function LoginPage() {
         <div className="flex justify-center gap-2 md:justify-start">
           <a href="#" className="flex items-center gap-2 font-medium">
             <div className="flex h-20 w-32 items-center justify-center rounded-md bg-primary mx-10 text-primary-foreground">
-            <img src="./landing/logo.png" alt="logo" className="w-full"/>
+              <img src="./landing/logo.png" alt="logo" className="w-full" />
             </div>
-            </a>
+          </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginForm />
+            <SignInForm />{" "}
           </div>
         </div>
       </div>
       <div className="relative hidden lg:block bg-primary">
-      <div className="flex h-full w-full items-center justify-center rounded-none bg-primary mx-10 text-primary-foreground">
-            <img src="./landing/logo.png" alt="logo" className="w-full  pr-10"/>
-            </div>
+        <div className="flex h-full w-full items-center justify-center rounded-none bg-primary mx-10 text-primary-foreground">
+          <img src="./landing/logo.png" alt="logo" className="w-full  pr-10" />
+        </div>
       </div>
     </div>
-  )
+  );
 }
