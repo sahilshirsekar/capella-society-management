@@ -1,4 +1,6 @@
+import Link from "next/link";
 import ButtonWithModal from "./ui/button-with-modal";
+import { buttonVariants } from "./ui/button";
 
 export default function Hero(){
   return(
@@ -12,6 +14,8 @@ export default function Hero(){
           </h4>
           <p className="text-lg mb-6 mt-5"></p>
           <ButtonWithModal buttonText="Get Started" buttonClassName="bg-white items-start text-blue-600 px-6 py-3 rounded font-medium hover:bg-gray-200"/>
+          <Link href="/dashboard" className={buttonVariants()}>Open My Admin</Link>
+
         </div>
       </section>
   )

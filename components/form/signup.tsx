@@ -15,27 +15,18 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import GoogleSignInButton from "../ui/google-signin-button";
-import { useRouter } from "next/navigation";
 import { userAgent } from "next/server";
-import {signIn} from 'next-auth/react'
+import { useReducer } from "react";
+import { useRouter } from "next/navigation";
 
 const FormSchema = z
   .object({
-    username: z
-      .string()
-      .min(1, "Username is required")
-      .max(100)
-      .regex(/^\S*$/, "Username cannot contain spaces"),
+    username: z.string().min(1, "Username is required").max(100),
     email: z.string().min(1, "Email is required").email("Invalid email"),
     password: z
       .string()
       .min(1, "Password is required")
-      .min(8, "Password must have than 8 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(
-        /[^a-zA-Z0-9]/,
-        "Password must contain at least one special character"
-      ),
+      .min(8, "Password must have than 8 characters"),
     confirmPassword: z.string().min(1, "Password confirmation is required"),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -59,7 +50,7 @@ const SignUpForm = () => {
     const response = await fetch("/api/user", {
       method: "POST",
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         username: values.username,
@@ -68,22 +59,19 @@ const SignUpForm = () => {
       }),
     });
 
-    if (response.ok) {
-      router.push("/dashboard");
-    } else {
-      alert("Registration failed");
-    }
-  };
+//     const responseData = await response.json();
+// console.log("Response Status:", response.status); // Log status code
+// console.log("Response Data:", responseData); 
 
-  const handleGoogleSignIn = async () => {
-    const result = await signIn('google'); // This triggers Google OAuth login
-    console.log(result)
-    router.push('/dashboard')
+    if (response.ok) {
+      router.push("/signin");
+    } else {
+      alert(`Registration failed`);    }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full ">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
         <div className="space-y-2">
           <FormField
             control={form.control}
@@ -92,7 +80,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="Capella" {...field} />
+                  <Input placeholder="johndoe" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -105,7 +93,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="capella@example.com" {...field} />
+                  <Input placeholder="mail@example.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -153,10 +141,10 @@ const SignUpForm = () => {
       <div className="mx-auto my-4 flex w-full items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400">
         or
       </div>
-      <GoogleSignInButton onClick={() => {}}>Sign up with Google</GoogleSignInButton>
+      <GoogleSignInButton>Sign up with Google</GoogleSignInButton>
       <p className="text-center text-sm text-gray-600 mt-2">
-        If you already have an account, please&nbsp;
-        <Link className="text-blue-500 hover:underline" href="/signin">
+        If you don&apos;t have an account, please&nbsp;
+        <Link className="text-blue-500 hover:underline" href="/sign-in">
           Sign in
         </Link>
       </p>

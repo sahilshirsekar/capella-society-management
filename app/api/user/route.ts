@@ -1,61 +1,47 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { db } from "@/lib/db";
+import { z } from "zod";
 import { hash } from "bcrypt";
-import * as z from 'zod';
+import { db } from "@/lib/db";
+import { NextResponse } from "next/server";
 
-// const client = new PrismaClient();
-
-
-//user schema for input validation
-const userSchema = z
-  .object({
-    username: z.string().min(1, 'Username is required').max(100),
-    email: z.string().min(1, 'Email is required').email('Invalid email'),
-    password: z
-      .string()
-      .min(1, 'Password is required')
-      .min(8, 'Password must have than 8 characters'),
-  })
-  
+export const userSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  username: z.string().min(3, "Username must be at least 3 characters long"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
+});
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, username, password } = userSchema.parse(body);
+    console.log("Request body:", body); // Debug incoming data
 
-    //check it the user with email already exists
+    const { email, username, password } = userSchema.parse(body); // Validate input
+
+    // Check if email already exists
     const existingUserByEmail = await db.user.findUnique({
-      where: {
-        email: email,
-      },
+      where: { email },
     });
     if (existingUserByEmail) {
       return NextResponse.json(
-        {
-          user: null,
-          message: "User with this email already exists",
-        },
+        { user: null, message: "User with this email already exists" },
         { status: 409 }
       );
     }
-    //check it the user with username already exists
+
+    // Check if username already exists
     const existingUserByUsername = await db.user.findUnique({
-      where: {
-        username: username,
-      },
+      where: { username },
     });
     if (existingUserByUsername) {
       return NextResponse.json(
-        {
-          user: null,
-          message: "User with this username already exists",
-        },
+        { user: null, message: "User with this username already exists" },
         { status: 409 }
       );
     }
-    // hashed password to protect the password
+
+    // Hash the password
     const hashedPassword = await hash(password, 10);
+
+    // Create new user
     const newUser = await db.user.create({
       data: {
         username,
@@ -64,25 +50,26 @@ export async function POST(req: Request) {
       },
     });
 
-    const { password: newUserPassword, ...rest } = newUser;
+    // Exclude password from response
+    const { password: _, ...rest } = newUser;
 
     return NextResponse.json(
-      {
-        user: rest,
-        message: "User created successfully",
-      },
-      {
-        status: 201,
-      }
+      { user: rest, message: "User created successfully" },
+      { status: 201 }
     );
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("Validation errors:", error.errors);
+      return NextResponse.json(
+        { message: "Validation failed", errors: error.errors },
+        { status: 400 }
+      );
+    }
+
+    console.error("Unexpected error:", error);
     return NextResponse.json(
-      {
-        message: "Something went wrong",
-      },
-      {
-        status: 500,
-      }
+      { message: "Something went wrong" },
+      { status: 500 }
     );
   }
 }

@@ -66,6 +66,7 @@ const menuItems = [
 ]
 
 export function DashboardSidebar() {
+
   const [openItems, setOpenItems] = useState<string[]>([])
 
   const toggleItem = (label: string) => {
@@ -127,8 +128,6 @@ export function DashboardSidebar() {
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium">John Doe</p>
-              <p className="text-xs text-muted-foreground">john@example.com</p>
             </div>
           </div>
           <DropdownMenu>

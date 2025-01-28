@@ -7,7 +7,9 @@ import { QuickLinkButton } from "@/components/ui/quick-link-button";
 import { QuickLinks } from "@/components/quick-links";
 import { ActivityFeed } from "@/components/activity-feed";
 
+
 export default function DashboardPage() {
+  
   const overviews = [
     {
       id: 1,
@@ -41,6 +43,8 @@ export default function DashboardPage() {
     { id: 2, user: 'Guard', action: 'Logged a visitor entry', timestamp: '10 mins ago' },
     { id: 3, user: 'Member', action: 'Paid maintenance fee', timestamp: '1 hour ago' },
   ];
+
+  
 
   return (
     <div className="flex flex-col gap-5">
