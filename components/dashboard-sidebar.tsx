@@ -33,7 +33,10 @@ import {
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
+import { useSession } from "next-auth/react"
 
 const menuItems = [
   { icon: Home, label: "Dashboard", href: "./dashboard"
@@ -66,11 +69,14 @@ const menuItems = [
 ]
 
 export function DashboardSidebar() {
+  const {data : session} = useSession();
 
   const [openItems, setOpenItems] = useState<string[]>([])
 
   const toggleItem = (label: string) => {
-    setOpenItems((prev) => (prev.includes(label) ? prev.filter((item) => item !== label) : [...prev, label]))
+    useEffect(() => {
+      setOpenItems((prev) => (prev.includes(label) ? prev.filter((item) => item !== label) : [...prev, label]))
+    }, [])
   }
 
   return (
@@ -125,9 +131,11 @@ export function DashboardSidebar() {
           <div className="flex items-center space-x-4">
             <Avatar>
               <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>SS</AvatarFallback>
             </Avatar>
+          {/* <pre>{JSON.stringify(session?.user.username)}</pre> */}
             <div>
+              
             </div>
           </div>
           <DropdownMenu>

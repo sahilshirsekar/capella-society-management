@@ -1,15 +1,27 @@
-import { FC, ReactNode } from 'react';
-import { Button } from './button';
-
+import { FC, ReactNode, useState } from "react";
+import { Button } from "./button";
+import { signIn } from "next-auth/react";
 
 interface GoogleSignInButtonProps {
   children: ReactNode;
 }
 const GoogleSignInButton: FC<GoogleSignInButtonProps> = ({ children }) => {
-  const loginWithGoogle = () => console.log('login with google');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const loginWithGoogle = async () => {
+    try {
+      setIsLoading(true);
+      await signIn("google", {
+        callbackUrl: `${window.location.origin}/dashboard`,
+      });
+    } catch (error) {
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
-    <Button onClick={loginWithGoogle} className='w-full'>
+    <Button onClick={loginWithGoogle} className="w-full">
       {children}
     </Button>
   );

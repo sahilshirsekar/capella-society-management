@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { db } from "./db";
 import { compare } from "bcrypt";
@@ -14,6 +15,11 @@ export const authOptions: NextAuthOptions = {
     signIn: "/signin", // Custom sign-in page
   },
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+    }),  
+
     CredentialsProvider({
       name: "Credentials", // Display name for the credentials provider
       credentials: {
@@ -40,10 +46,12 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Compare the provided password with the stored hashed password
-        const passwordMatch = await compare(credentials.password, existingUser.password);
-        if (!passwordMatch) {
-          console.log("Password mismatch for email:", credentials.email);
-          return null; // Password mismatch
+        if(existingUser.password){
+          const passwordMatch = await compare(credentials.password, existingUser.password);
+          if (!passwordMatch) {
+            console.log("Password mismatch for email:", credentials.email);
+            return null; // Password mismatch
+          }
         }
 
         // Return the user object to include in the JWT
@@ -55,4 +63,25 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user}) {
+      if(user){
+        return {
+          ...token, 
+          username : user.username
+        }
+      }
+      return token
+    },
+    async session({ session, token }) {
+      console.log(token, session)
+      return {
+        ...session, 
+        user : {
+          ...session.user,
+          username : token.username
+        }
+      }
+    }
+  }
 };

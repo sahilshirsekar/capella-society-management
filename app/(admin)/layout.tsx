@@ -2,6 +2,8 @@ import "@/app/globals.css"
 import { Inter } from "next/font/google"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { DashboardLayout } from "@/components/dashboard-layout"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -15,6 +17,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+
   return (
     <html lang="en">
       <body className={`${inter.className} bg-background text-foreground`}>

@@ -18,6 +18,7 @@ import GoogleSignInButton from "../ui/google-signin-button";
 import { userAgent } from "next/server";
 import { useReducer } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const FormSchema = z
   .object({
@@ -36,6 +37,7 @@ const FormSchema = z
 
 const SignUpForm = () => {
   const router = useRouter();
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -59,14 +61,19 @@ const SignUpForm = () => {
       }),
     });
 
-//     const responseData = await response.json();
-// console.log("Response Status:", response.status); // Log status code
-// console.log("Response Data:", responseData); 
+    //     const responseData = await response.json();
+    // console.log("Response Status:", response.status); // Log status code
+    // console.log("Response Data:", responseData);
 
     if (response.ok) {
       router.push("/signin");
     } else {
-      alert(`Registration failed`);    }
+      toast({
+        title: "Sign-up failed. ",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -80,7 +87,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="johndoe" {...field} />
+                  <Input placeholder="capella" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -93,7 +100,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="mail@example.com" {...field} />
+                  <Input placeholder="capella@gmail.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -143,8 +150,8 @@ const SignUpForm = () => {
       </div>
       <GoogleSignInButton>Sign up with Google</GoogleSignInButton>
       <p className="text-center text-sm text-gray-600 mt-2">
-        If you don&apos;t have an account, please&nbsp;
-        <Link className="text-blue-500 hover:underline" href="/sign-in">
+        If you already have an account, please&nbsp;
+        <Link className="text-blue-500 hover:underline" href="/signin">
           Sign in
         </Link>
       </p>
