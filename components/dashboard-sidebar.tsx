@@ -82,8 +82,8 @@ export function DashboardSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="px-4 py-2">
-        <div className="bg-primary rounded-xl py-5 flex items-center justify-center">
-      <img src="/landing/logo.png" alt="logo" className="w-1/2"/>
+        <div className="rounded-xl py-5 flex items-center justify-center">
+      <img src="/landing/logo.png" alt="logo" className=""/>
         </div>
       </SidebarHeader>
       <SidebarContent>

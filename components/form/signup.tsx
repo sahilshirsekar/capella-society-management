@@ -87,7 +87,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="capella" {...field} />
+                  <Input placeholder="RamRajya" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -100,7 +100,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="capella@gmail.com" {...field} />
+                  <Input placeholder="RamRajya@gmail.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -141,7 +141,7 @@ const SignUpForm = () => {
             )}
           />
         </div>
-        <Button className="w-full mt-6" type="submit">
+        <Button className="w-full mt-6 bg-customBg" type="submit">
           Sign up
         </Button>
       </form>

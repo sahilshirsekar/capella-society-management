@@ -92,7 +92,7 @@ const SignInForm = () => {
             )}
           />
         </div>
-        <Button className='w-full mt-6' type='submit'>
+        <Button className='w-full mt-6 bg-customBg' type='submit'>
           Sign in
         </Button>
       </form>
