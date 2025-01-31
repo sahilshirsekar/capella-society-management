@@ -10,39 +10,24 @@ import crypto from "crypto";
 //   email: z.string().email("Invalid email format"),
 //   phone: z.string().length(10, "Phone number must be exactly 10 digits").regex(/^\d{10}$/, "Phone number must contain only numbers"),
 // });
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log(body);
 
-    const { name, address, pinCode, email, phone, logo, members } = body;
+    const { name, address, pinCode, email, phone, logo, members, buildings } = body;
 
     const existingSocietyByEmail = await db.society.findUnique({
       where: { email },
     });
     if (existingSocietyByEmail) {
       return NextResponse.json(
-        {
-          society: null,
-          message: "Society with this email already exists",
-        },
-        {
-          status: 409,
-        }
+        { society: null, message: "Society with this email already exists" },
+        { status: 409 }
       );
     }
 
-    // const existingSocietyByName = await db.society.findUnique({
-    //   where: { name },
-    // });
-    // if (existingSocietyByName) {
-    //   return NextResponse.json(
-    //     { society: null, message: "Society with this name already exists" },
-    //     { status: 409 }
-    //   );
-    // }
-
+    // Hash passwords for committee members and send temporary login credentials
     const hashedMembers = await Promise.all(
       members.map(async (member: any) => {
         const tempPassword = crypto.randomBytes(6).toString("hex");
@@ -58,9 +43,9 @@ export async function POST(req: Request) {
           Email : ${member.email}
           Temporary Password : ${tempPassword}
           
-          Please change your password after logging in.
-          `
+          Please change your password after logging in.`
         );
+
         return {
           ...member,
           password: hashedPassword,
@@ -68,6 +53,7 @@ export async function POST(req: Request) {
       })
     );
 
+    // Create Society along with members and buildings
     const newSociety = await db.society.create({
       data: {
         name,
@@ -85,8 +71,16 @@ export async function POST(req: Request) {
             password: member.password,
           })),
         },
+        buildings: {
+          create: buildings.map((building: { name: string }) => ({
+            name: building.name,
+          })),
+        },
       },
-      include: { members: true },
+      include: {
+        members: true, 
+        buildings: true
+      },
     });
 
     return NextResponse.json(
@@ -94,55 +88,19 @@ export async function POST(req: Request) {
         message: "Society registered successfully!",
         society: {
           ...newSociety,
-          committeeMembers: newSociety.members.map(
-            ({ name, email, phone, role }) => ({
-              name,
-              email,
-              phone,
-              role,
-            })
-          ),
+          committeeMembers: newSociety.members.map(({ name, email, phone, role } : any) => ({
+            name,
+            email,
+            phone,
+            role,
+          })),e
+          buildings: newSociety.buildings.map(({ id, name } : any) => ({ id, name })),
         },
       },
-      {
-        status: 201,
-      }
+      { status: 201 }
     );
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      {
-        message: "Something went wrong",
-      },
-      {
-        status: 500,
-      }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    const societies = await db.society.findMany({
-      include: {
-        members: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            role: true,
-          },
-        },
-      },
-    });
-
-    return NextResponse.json({ societies }, { status: 200 });
-  } catch (error) {
-    console.error("Error fetching societies:", error);
-    return NextResponse.json(
-      { message: "Failed to fetch societies" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
   }
 }

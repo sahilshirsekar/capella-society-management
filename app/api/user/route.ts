@@ -9,6 +9,17 @@ export const userSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
+export async function GET() {
+  try {
+    const users = await db.user.findMany();
+    return NextResponse.json({users}, {status: 201})
+  } catch (error) {
+    return NextResponse.json({
+      message : "aye bhai"
+    })
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -73,3 +84,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

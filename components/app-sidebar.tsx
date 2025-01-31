@@ -1,4 +1,4 @@
-"use client"
+
 
 import * as React from "react"
 import {
@@ -26,11 +26,13 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
+    name: "ramrajya",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
@@ -55,7 +57,7 @@ const data = {
     {
       title: "Society Control",
       url: "",
-      icon: SquareTerminal,
+      icon: '/landing/analytics.png'     ,
       isActive: true,
       items: [
         {
@@ -75,7 +77,7 @@ const data = {
     {
       title: "Models",
       url: "#",
-      icon: Bot,
+      icon: '/landing/analytics.png' ,
       items: [
         {
           title: "Genesis",
@@ -94,7 +96,7 @@ const data = {
     {
       title: "Documentation",
       url: "#",
-      icon: BookOpen,
+      icon: '/landing/analytics.png' ,
       items: [
         {
           title: "Introduction",
@@ -117,7 +119,7 @@ const data = {
     {
       title: "Settings",
       url: "#",
-      icon: Settings2,
+      icon: '/landing/analytics.png' ,
       items: [
         {
           title: "General",
@@ -142,38 +144,48 @@ const data = {
     {
       name: "Design Engineering",
       url: "#",
-      icon: Frame,
+      // icon: Frame,
     },
     {
       name: "Sales & Marketing",
       url: "#",
-      icon: PieChart,
+      // icon: PieChart,
     },
     {
       name: "Travel",
       url: "#",
-      icon: Map,
+      // icon: Map,
     },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const session = await getServerSession(authOptions);
+
+  // Ensure user properties are not `null`
+  const safeUser = session?.user
+    ? {
+        name: session.user.name ?? undefined,
+        email: session.user.email ?? undefined,
+        avatar: session.user.image ?? undefined, // Ensure consistency with `NavUser` props
+        username: session.user.username ?? undefined
+      }
+    : data.user;
+
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar variant="floating" collapsible="icon" {...props}>
       <SidebarHeader>
-        {/* <TeamSwitcher teams={data.teams} /> */}
         <Link href="">
-        <img src="./landing/logo.png" alt="" />
+          <img src="./landing/logo.png" alt="Logo" />
         </Link>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={safeUser} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

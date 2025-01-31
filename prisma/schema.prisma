@@ -13,14 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model User {
-//   id        Int      @id @default(autoincrement())
-//   email     String   @unique
-//   username  String   @unique
-//   password  String
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
 model Account {
   id                String  @id @default(cuid())
   userId            String  @map("user_id")
@@ -77,23 +69,24 @@ model VerificationToken {
 }
 
 model Society {
-  id          String    @id @default(cuid())
-  name        String
-  address     String
-  pinCode     String
-  email       String  @unique
-  phone       String
-  logo        String? // Optional Logo URL
-  members     CommitteeMember[]
-  createdAt   DateTime @default(now())
+  id        String            @id @default(cuid())
+  name      String
+  address   String
+  pinCode   String
+  email     String            @unique
+  phone     String
+  logo      String?
+  buildings Building[]
+  members   CommitteeMember[]
+  createdAt DateTime          @default(now())
 }
 
 model CommitteeMember {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   societyId String
-  society   Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
+  society   Society  @relation(fields: [societyId], references: [id], onDelete: Cascade)
   name      String
-  email     String  @unique
+  email     String   @unique
   phone     String
   role      Role
   password  String
@@ -109,3 +102,34 @@ enum Role {
   MEMBER
 }
 
+model Building {
+  id        String  @id @default(cuid())
+  name      String
+  societyId String
+  society   Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
+  floors    Floor[]
+  Shop      Shop[]
+}
+
+model Floor {
+  id         String   @id @default(cuid())
+  number     Int
+  buildingId String
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  rooms      Room[]
+}
+
+model Room {
+  id      String @id @default(cuid())
+  number  String
+  floorId String
+  floor   Floor  @relation(fields: [floorId], references: [id], onDelete: Cascade)
+}
+
+model Shop {
+  id         String   @id @default(cuid())
+  name       String
+  owner      String
+  buildingId String
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+}

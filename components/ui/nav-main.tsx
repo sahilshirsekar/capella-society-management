@@ -24,7 +24,7 @@ export function NavMain({
   items: {
     title: string
     url: string
-    icon?: LucideIcon
+    icon?: LucideIcon | string
     isActive?: boolean
     items?: {
       title: string
@@ -34,7 +34,7 @@ export function NavMain({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Admin Access</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
@@ -45,8 +45,18 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
+                {/* <SidebarMenuButton tooltip={item.title}>
                   {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                </SidebarMenuButton> */}
+                <SidebarMenuButton tooltip={item.title} className="hover:bg-gray-300 active:bg-gray-300">
+                  {/* Render the icon */}
+                  {item.icon && typeof item.icon === 'string' ? (
+                    <img src={item.icon} alt={item.title} className="h-6 w-6" />
+                  ) : (
+                    item.icon && <item.icon className="h-6 w-6" />
+                  )}
                   <span>{item.title}</span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
@@ -55,7 +65,7 @@ export function NavMain({
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
+                      <SidebarMenuSubButton asChild className="hover:bg-gray-300">
                         <a href={subItem.url}>
                           <span>{subItem.title}</span>
                         </a>
