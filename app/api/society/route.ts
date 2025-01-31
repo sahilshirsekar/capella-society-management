@@ -1,8 +1,9 @@
 import { db } from "@/lib/db";
 import { hash } from "bcrypt";
-import { sendEmail } from "@/lib/email"; // Send temporary password
+import { sendMail } from "@/lib/email"; // Send temporary password
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
+import crypto from "crypto";
 
 // const societySchema = z.object({
 //   pinCode: z.string().length(6, "PinCode must be exactly 6 digits").regex(/^\d{6}$/, "PinCode must contain only numbers"),
@@ -44,7 +45,22 @@ export async function POST(req: Request) {
 
     const hashedMembers = await Promise.all(
       members.map(async (member: any) => {
-        const hashedPassword = await hash(member.password, 10);
+        const tempPassword = crypto.randomBytes(6).toString("hex");
+        const hashedPassword = await hash(tempPassword, 10);
+
+        await sendMail(
+          member.email,
+          "Your Society Committee Credentials",
+          `Welcome to ${name} Society!
+          You have been added as a ${member.role}.
+          
+          Login Details:
+          Email : ${member.email}
+          Temporary Password : ${tempPassword}
+          
+          Please change your password after logging in.
+          `
+        );
         return {
           ...member,
           password: hashedPassword,
@@ -79,8 +95,11 @@ export async function POST(req: Request) {
         society: {
           ...newSociety,
           committeeMembers: newSociety.members.map(
-            ({ name , email, phone, role}) => ({
-              name, email, phone, role
+            ({ name, email, phone, role }) => ({
+              name,
+              email,
+              phone,
+              role,
             })
           ),
         },
@@ -112,7 +131,7 @@ export async function GET() {
             name: true,
             email: true,
             phone: true,
-            role: true, 
+            role: true,
           },
         },
       },

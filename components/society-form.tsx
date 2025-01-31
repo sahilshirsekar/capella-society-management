@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { toast, useToast } from "@/hooks/use-toast";
 
+// Define committee member roles
 const memberRoles = [
   "PRESIDENT",
   "VICE_PRESIDENT",
@@ -17,6 +18,7 @@ const memberRoles = [
   "MEMBER",
 ] as const;
 
+// Zod validation schema
 const societySchema = z.object({
   name: z.string().min(3, "Society name must be at least 3 characters long"),
   address: z.string().min(5, "Address must be at least 5 characters long"),
@@ -31,7 +33,6 @@ const societySchema = z.object({
         email: z.string().email("Invalid email format"),
         phone: z.string().length(10, "Phone number must be exactly 10 digits"),
         role: z.enum(memberRoles),
-        password: z.string().min(6, "Password must be at least 6 characters long"),
       })
     )
     .min(5, "At least 5 committee members are required")
@@ -39,7 +40,7 @@ const societySchema = z.object({
 });
 
 export default function SocietyRegistration() {
-  const {toast} = useToast();
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -58,11 +59,11 @@ export default function SocietyRegistration() {
       phone: "",
       logo: "",
       members: [
-        { name: "", email: "", phone: "", role: "PRESIDENT", password: "" },
-        { name: "", email: "", phone: "", role: "VICE_PRESIDENT", password: "" },
-        { name: "", email: "", phone: "", role: "TREASURER", password: "" },
-        { name: "", email: "", phone: "", role: "ASSISTANT_TREASURER", password: "" },
-        { name: "", email: "", phone: "", role: "SECRETARY", password: "" },
+        { name: "", email: "", phone: "", role: "PRESIDENT" },
+        { name: "", email: "", phone: "", role: "VICE_PRESIDENT" },
+        { name: "", email: "", phone: "", role: "TREASURER" },
+        { name: "", email: "", phone: "", role: "ASSISTANT_TREASURER" },
+        { name: "", email: "", phone: "", role: "SECRETARY" },
       ],
     },
   });
@@ -71,7 +72,7 @@ export default function SocietyRegistration() {
 
   const addMember = () => {
     if (members.length < 10) {
-      setValue("members", [...members, { name: "", email: "", phone: "", role: "MEMBER", password: "" }]);
+      setValue("members", [...members, { name: "", email: "", phone: "", role: "MEMBER" }]);
     }
   };
 
@@ -92,48 +93,47 @@ export default function SocietyRegistration() {
       const result = await response.json();
       if (response.ok) {
         toast({
-          title: "Society Registered Successfully!"
+          title: "Society Registered Successfully!",
+          description: "Login details have been sent to committee members.",
         });
       } else {
-        alert(result.message || "Something went wrong");
+        toast({
+          title: "Registration Failed",
+          description: result.message || "Something went wrong",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
       toast({
-        title : "Failed to register society"
+        title: "Failed to register society",
+        description: "Please try again later.",
+        variant: "destructive",
       });
     }
   };
 
   return (
+    <div className="flex items-center justify-center min-h-screen bg-white">
+
     <div className="max-w-3xl mx-auto p-8 bg-white shadow-2xl rounded-2xl">
       <h2 className="text-3xl font-bold text-center mb-6">Society Registration</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div>
-          <input {...register("name")} placeholder="Society Name" className="input-field" />
-          {errors.name && <p className="error">{errors.name.message}</p>}
-        </div>
+        <input {...register("name")} placeholder="Society Name" className="input-field" />
+        {errors.name && <p className="error">{errors.name.message}</p>}
 
-        <div>
-          <input {...register("address")} placeholder="Address" className="input-field" />
-          {errors.address && <p className="error">{errors.address.message}</p>}
-        </div>
+        <input {...register("address")} placeholder="Address" className="input-field" />
+        {errors.address && <p className="error">{errors.address.message}</p>}
 
-        <div>
-          <input {...register("pinCode")} placeholder="Pin Code" className="input-field" />
-          {errors.pinCode && <p className="error">{errors.pinCode.message}</p>}
-        </div>
+        <input {...register("pinCode")} placeholder="Pin Code" className="input-field" />
+        {errors.pinCode && <p className="error">{errors.pinCode.message}</p>}
 
-        <div>
-          <input {...register("email")} placeholder="Email" className="input-field" />
-          {errors.email && <p className="error">{errors.email.message}</p>}
-        </div>
+        <input {...register("email")} placeholder="Email" className="input-field" />
+        {errors.email && <p className="error">{errors.email.message}</p>}
 
-        <div>
-          <input {...register("phone")} placeholder="Phone" className="input-field" />
-          {errors.phone && <p className="error">{errors.phone.message}</p>}
-        </div>
+        <input {...register("phone")} placeholder="Phone" className="input-field" />
+        {errors.phone && <p className="error">{errors.phone.message}</p>}
 
         <div>
           {members.map((member, index) => (
@@ -170,9 +170,6 @@ export default function SocietyRegistration() {
                 )}
               />
 
-              <input {...register(`members.${index}.password`)} type="password" placeholder="Password" className="input-field" />
-              {errors.members?.[index]?.password && <p className="error">{errors.members[index].password?.message}</p>}
-
               {index >= 5 && (
                 <Button type="button" onClick={() => removeMember(index)} variant="destructive">
                   Remove
@@ -192,6 +189,7 @@ export default function SocietyRegistration() {
           Register Society
         </Button>
       </form>
+    </div>
     </div>
   );
 }

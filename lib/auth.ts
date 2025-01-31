@@ -21,7 +21,7 @@ export const authOptions: NextAuthOptions = {
     }),  
 
     CredentialsProvider({
-      name: "Credentials", // Display name for the credentials provider
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email", placeholder: "user@example.com" },
         password: { label: "Password", type: "password" },
@@ -56,9 +56,10 @@ export const authOptions: NextAuthOptions = {
 
         // Return the user object to include in the JWT
         return {
-          id: `${existingUser.id}`,
+          id: String(existingUser.id),
           username: existingUser.username,
           email: existingUser.email,
+          image : existingUser.image || null
         };
       },
     }),
