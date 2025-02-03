@@ -69,16 +69,18 @@ model VerificationToken {
 }
 
 model Society {
-  id        String            @id @default(cuid())
-  name      String
-  address   String
-  pinCode   String
-  email     String            @unique
-  phone     String
-  logo      String?
-  buildings Building[]
-  members   CommitteeMember[]
-  createdAt DateTime          @default(now())
+  id            String            @id @default(cuid())
+  name          String
+  societyNumber String
+  address       String
+  pinCode       String
+  email         String            @unique
+  phone         String
+  logo          String?
+  buildings     Building[]
+  members       CommitteeMember[]
+  residents     Resident[]
+  createdAt     DateTime          @default(now())
 }
 
 model CommitteeMember {
@@ -86,10 +88,9 @@ model CommitteeMember {
   societyId String
   society   Society  @relation(fields: [societyId], references: [id], onDelete: Cascade)
   name      String
-  email     String   @unique
+  email     String
   phone     String
   role      Role
-  password  String
   createdAt DateTime @default(now())
 }
 
@@ -102,34 +103,47 @@ enum Role {
   MEMBER
 }
 
+model Resident {
+  id        String   @id @default(cuid())
+  societyId String
+  society   Society  @relation(fields: [societyId], references: [id], onDelete: Cascade)
+  roomId    String?  @unique
+  room      Room?    @relation(fields: [roomId], references: [id]) // Define relation here
+  name      String
+  email     String   
+  phone     String
+  password  String
+  createdAt DateTime @default(now())
+}
+
 model Building {
   id        String  @id @default(cuid())
   name      String
   societyId String
   society   Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
   floors    Floor[]
-  Shop      Shop[]
 }
 
 model Floor {
   id         String   @id @default(cuid())
-  number     Int
+  number     String
   buildingId String
   building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
   rooms      Room[]
 }
 
 model Room {
-  id      String @id @default(cuid())
-  number  String
-  floorId String
-  floor   Floor  @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  id       String    @id @default(cuid())
+  number   String
+  floorId  String
+  floor    Floor     @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  resident Resident?
 }
 
-model Shop {
-  id         String   @id @default(cuid())
-  name       String
-  owner      String
-  buildingId String
-  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
-}
+// model Shop {
+//   id         String   @id @default(cuid())
+//   name       String
+//   owner      String
+//   buildingId String
+//   building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+// }

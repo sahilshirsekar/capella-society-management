@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Floor" ALTER COLUMN "number" SET DATA TYPE TEXT;
+
+-- AlterTable
+ALTER TABLE "Room" ALTER COLUMN "number" SET DATA TYPE TEXT;
