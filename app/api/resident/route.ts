@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         phone: parsedBody.phone,
         password: hashedPassword, // Save hashed temporary password
         society: {
-          connect: { id: parsedBody.societyId }, // Connect resident to an existing society by ID
+          connect: { id: parsedBody.societyId },  // Connect resident to an existing society by ID
         },
         room: {
           connect: { id: parsedBody.roomId },
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
 
 Welcome to RamRajya Society Management! Below are your account details:
 
-- Room ID: ${parsedBody.roomId}
+- Room ID: 
 - Email: ${parsedBody.email}
 - Temporary Password: ${tempPassword}
 
