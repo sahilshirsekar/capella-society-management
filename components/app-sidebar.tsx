@@ -69,8 +69,8 @@ const data = {
           url: "/registration",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Society Resident",
+          url: "/residents",
         },
       ],
     },

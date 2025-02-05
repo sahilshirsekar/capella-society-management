@@ -1,13 +1,13 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt"; // Import bcrypt for hashing passwords
+import bcrypt from "bcrypt"; // For hashing passwords
 import * as z from "zod";
+import { sendMail } from "@/lib/email"; // Import sendMail from email.ts
 
 const residentSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email format"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
   societyId: z.string().cuid("Invalid Society ID format"),
   roomId: z.string().cuid("Invalid Room ID format"),
 });
@@ -18,37 +18,34 @@ type ResidentInput = z.infer<typeof residentSchema>;
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log(body);
-    const { name, email, phone, password, societyId, roomId } = body;
-    if (!body || typeof body !== "object") {
+    const parsedBody: ResidentInput = residentSchema.parse(body);
+    console.log(parsedBody)
+
+    // Check if the room is already assigned to a resident
+    const existingResident = await db.resident.findUnique({
+      where: { roomId: parsedBody.roomId },
+    });
+
+    if (existingResident) {
       return NextResponse.json(
-        { message: "Invalid JSON format" },
+        { message: "A resident is already assigned to this room." },
         { status: 400 }
       );
     }
-    const parsedBody: ResidentInput = residentSchema.parse(body);
 
-    // Hash the password before saving it to the database
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+    // Generate a temporary password
+    const tempPassword = Math.random().toString(36).slice(-8);
+
+    // Hash the temporary password
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
     // Create the new resident
-    console.log(
-      "Final payload : ",
-      JSON.stringify({
-        name,
-        email,
-        phone,
-        password,
-        societyId,
-        roomId
-      })
-    );
     const newResident = await db.resident.create({
       data: {
         name: parsedBody.name,
         email: parsedBody.email,
         phone: parsedBody.phone,
-        password: hashedPassword, // Save the hashed password
+        password: hashedPassword, // Save hashed temporary password
         society: {
           connect: { id: parsedBody.societyId }, // Connect resident to an existing society by ID
         },
@@ -58,8 +55,26 @@ export async function POST(req: Request) {
       },
     });
 
+    // Email content
+    const emailSubject = "Welcome to RamRajya - Society Management";
+    const emailText = `Hi ${parsedBody.name},
+
+Welcome to RamRajya Society Management! Below are your account details:
+
+- Room ID: ${parsedBody.roomId}
+- Email: ${parsedBody.email}
+- Temporary Password: ${tempPassword}
+
+Please log in and change your password immediately for security purposes.
+
+Best regards,
+RamRajya - Society Management Team`;
+
+    // Send the email
+    await sendMail(parsedBody.email, emailSubject, emailText);
+
     return NextResponse.json(
-      { message: "Resident created successfully", newResident },
+      { message: "Resident created successfully, and email sent.", newResident },
       { status: 200 }
     );
   } catch (error) {
@@ -72,6 +87,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
     return NextResponse.json(
       { message: "Something went wrong" },
       { status: 500 }

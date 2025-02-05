@@ -30,7 +30,14 @@ const memberSchema = z.object({
   name: z.string().min(3, "Member name must be at least 3 characters long"),
   email: z.string().email("Invalid email format"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  role: z.enum(["PRESIDENT", "SECRETARY", "TREASURER", "MEMBER"]),
+  role: z.enum([
+    "PRESIDENT",
+    "VICE_PRESIDENT",
+    "TREASURER",
+    "ASSISTANT_TREASURER",
+    "SECRETARY",
+    "MEMBER",
+  ]),
 });
 
 const societySchema = z.object({
@@ -46,8 +53,7 @@ const societySchema = z.object({
     .nonempty("At least one committee member is required"),
   buildings: z
     .array(buildingSchema)
-    .nonempty("At least one building is required")
-  // residents: z.array(residentSchema).nonempty("only one resident for one room"),
+    .nonempty("At least one building is required"),
 });
 
 // Define TypeScript interfaces
@@ -82,7 +88,7 @@ export async function POST(req: Request) {
       phone,
       logo,
       members,
-      buildings
+      buildings,
     } = validatedData;
 
     const existingSocietyByEmail = await db.society.findUnique({
@@ -96,36 +102,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // const residentsWithPasswords = await Promise.all(
-    //   buildings.flatMap((building) =>
-    //     building.floors.flatMap((floor) =>
-    //       floor.rooms
-    //         .filter((room) => room.resident) // Only process rooms with residents
-    //         .map(async (room) => {
-    //           const tempPassword = crypto.randomBytes(3).toString("hex");
-    //           const hashedPassword = await hash(tempPassword, 10);
-
-    //           await sendMail(
-    //             room.resident!.email,
-    //             "Your Society Resident Credentials",
-    //             `Welcome to ${name} Society!
-    //             You have been added as a resident.
-                
-    //             Login Details:
-    //             Email: ${room.resident!.email}
-    //             Temporary Password: ${tempPassword}
-                
-    //             Please change your password after logging in.`
-    //           );
-
-    //           return {
-    //             ...room.resident,
-    //             password: hashedPassword,
-    //           };
-    //         })
-    //     )
-    //   )
-    // );
     // Create Society with related buildings, floors, rooms, and residents
     console.log(
       "Final Payload Before Create:",

@@ -1,13 +1,11 @@
 "use client";
-
-import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import { toast, useToast } from "@/hooks/use-toast";
-import build from "next/dist/build";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 // Define committee member roles
 const memberRoles = [
@@ -22,14 +20,21 @@ const memberRoles = [
 // Zod validation schema
 const societySchema = z.object({
   name: z.string().min(3, "Society name must be at least 3 characters long"),
+  societyNumber: z.string().min(3, "Society number is required"),
   address: z.string().min(5, "Address must be at least 5 characters long"),
   pinCode: z.string().length(6, "Pin Code must be exactly 6 digits"),
   email: z.string().email("Invalid email format"),
   phone: z.string().length(10, "Phone number must be exactly 10 digits"),
-  logo: z.string().optional(),
+  logo: z.string().url("Invalid logo URL").optional(),
   buildings: z.array(
     z.object({
       name: z.string(),
+      floors: z.array(
+        z.object({
+          number: z.string(),
+          rooms: z.array(z.object({ number: z.string() })),
+        })
+      ),
     })
   ),
   members: z
@@ -61,12 +66,15 @@ export default function SocietyRegistration() {
     mode: "onChange",
     defaultValues: {
       name: "",
+      societyNumber: "",
       address: "",
       pinCode: "",
       email: "",
       phone: "",
       logo: "",
-      buildings: [{ name: "" }],
+      buildings: [
+        { name: "", floors: [{ number: "", rooms: [{ number: "" }] }] },
+      ],
       members: [
         { name: "", email: "", phone: "", role: "PRESIDENT" },
         { name: "", email: "", phone: "", role: "VICE_PRESIDENT" },
@@ -83,9 +91,7 @@ export default function SocietyRegistration() {
     if (buildings.length < 10) {
       setValue("buildings", [
         ...buildings,
-        {
-          name: "",
-        },
+        { name: "", floors: [{ number: "", rooms: [{ number: "" }] }] },
       ]);
     }
   };
@@ -95,6 +101,44 @@ export default function SocietyRegistration() {
       setValue(
         "buildings",
         buildings.filter((_, i) => i !== index)
+      );
+    }
+  };
+
+  const addFloor = (buildingIndex: number) => {
+    setValue(`buildings.${buildingIndex}.floors`, [
+      ...buildings[buildingIndex].floors,
+      { number: "", rooms: [{ number: "" }] },
+    ]);
+  };
+
+  const removeFloor = (buildingIndex: number, floorIndex: number) => {
+    if (buildings[buildingIndex].floors.length > 1) {
+      setValue(
+        `buildings.${buildingIndex}.floors`,
+        buildings[buildingIndex].floors.filter((_, i) => i !== floorIndex)
+      );
+    }
+  };
+
+  const addRoom = (buildingIndex: number, floorIndex: number) => {
+    setValue(`buildings.${buildingIndex}.floors.${floorIndex}.rooms`, [
+      ...buildings[buildingIndex].floors[floorIndex].rooms,
+      { number: "" },
+    ]);
+  };
+
+  const removeRoom = (
+    buildingIndex: number,
+    floorIndex: number,
+    roomIndex: number
+  ) => {
+    if (buildings[buildingIndex].floors[floorIndex].rooms.length > 1) {
+      setValue(
+        `buildings.${buildingIndex}.floors.${floorIndex}.rooms`,
+        buildings[buildingIndex].floors[floorIndex].rooms.filter(
+          (_, i) => i !== roomIndex
+        )
       );
     }
   };
@@ -128,10 +172,12 @@ export default function SocietyRegistration() {
       });
 
       const result = await response.json();
+      console.log(result);
       if (response.ok) {
         toast({
           title: "Society Registered Successfully!",
           description: "Login details have been sent to committee members.",
+          className: "bg-green-500"
         });
       } else {
         toast({
@@ -164,6 +210,14 @@ export default function SocietyRegistration() {
             className="input-field"
           />
           {errors.name && <p className="error">{errors.name.message}</p>}
+          <input
+            {...register("societyNumber")}
+            placeholder="Society Number"
+            className="input-field"
+          />
+          {errors.societyNumber && (
+            <p className="error">{errors.societyNumber.message}</p>
+          )}
 
           <input
             {...register("address")}
@@ -192,36 +246,138 @@ export default function SocietyRegistration() {
             className="input-field"
           />
           {errors.phone && <p className="error">{errors.phone.message}</p>}
+          <input
+            {...register("logo")}
+            placeholder="Logo URL"
+            className="input-field"
+          />
+          {errors.logo && <p className="error">{errors.logo.message}</p>}
 
           <div>
-            {buildings.map((building, index) => (
+            {buildings.map((building, buildingIndex) => (
               <motion.div
-                key={index}
-                className="border p-4 rounded-lg bg-gray-100 shadow-md space-y-3"
+                key={buildingIndex}
+                className="border p-4 rounded-lg bg-gray-100 shadow-md space-y-3 mb-4"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
                 <h3 className="font-semibold text-lg text-[#613EEA]">
-                  Building No. : {index + 1}
+                  Building No. : {buildingIndex + 1}
                 </h3>
                 <input
-                  {...register(`buildings.${index}.name`)}
-                  placeholder="Name"
+                  {...register(`buildings.${buildingIndex}.name`)}
+                  placeholder="Building Name"
                   className="input-field"
                 />
-                {errors.buildings?.[index]?.name && (
-                  <p className="error">{errors.buildings[index].name?.message}</p>
+                {errors.buildings?.[buildingIndex]?.name && (
+                  <p className="error">
+                    {errors.buildings[buildingIndex].name?.message}
+                  </p>
                 )}
-                 {index >= 1 && (
+
+                {building.floors.map((floor, floorIndex) => (
+                  <motion.div
+                    key={floorIndex}
+                    className="border p-3 rounded-lg bg-white shadow-sm space-y-2 mt-2"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <h4 className="font-semibold  text-[#613EEA]">
+                      Floor No. : {floorIndex + 1}
+                    </h4>
+                    <input
+                      {...register(
+                        `buildings.${buildingIndex}.floors.${floorIndex}.number`
+                      )}
+                      placeholder="Floor Number"
+                      className="input-field"
+                    />
+                    {errors.buildings?.[buildingIndex]?.floors?.[floorIndex]
+                      ?.number && (
+                      <p className="error">
+                        {
+                          errors.buildings[buildingIndex].floors[floorIndex]
+                            .number?.message
+                        }
+                      </p>
+                    )}
+
+                    {floor.rooms.map((room, roomIndex) => (
+                      <motion.div
+                        key={roomIndex}
+                        className="flex items-center space-x-2"
+                        initial={{ opacity: 0, x: 5 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.1 }}
+                      >
+                        <input
+                          {...register(
+                            `buildings.${buildingIndex}.floors.${floorIndex}.rooms.${roomIndex}.number`
+                          )}
+                          placeholder="Room Number"
+                          className="input-field flex-grow"
+                        />
+                        {floor.rooms.length > 1 && (
+                          <Button
+                            type="button"
+                            onClick={() =>
+                              removeRoom(buildingIndex, floorIndex, roomIndex)
+                            }
+                            variant="destructive"
+                            size="sm"
+                          >
+                            Remove Room
+                          </Button>
+                        )}
+                      </motion.div>
+                    ))}
+                    <div className="space-x-5">
+                      <Button
+                        type="button"
+                        onClick={() => addRoom(buildingIndex, floorIndex)}
+                        size="sm"
+                        className="mt-2 bg-customBg "
+                      >
+                        Add Room
+                      </Button>
+
+                      {building.floors.length > 1 && (
+                        <Button
+                          type="button"
+                          onClick={() => removeFloor(buildingIndex, floorIndex)}
+                          variant="destructive"
+                          size="sm"
+                          className="mt-2"
+                        >
+                          Remove Floor
+                        </Button>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+                <div className="space-x-5">
                   <Button
                     type="button"
-                    onClick={() => removeBuilding(index)}
-                    variant="destructive"
+                    onClick={() => addFloor(buildingIndex)}
+                    size="sm"
+                    className="mt-2"
                   >
-                    Remove
+                    Add Floor
                   </Button>
-                )}
+
+                  {buildingIndex >= 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => removeBuilding(buildingIndex)}
+                      variant="destructive"
+                      className="mt-2"
+                    >
+                      Remove Building
+                    </Button>
+                  )}
+                </div>
               </motion.div>
             ))}
           </div>
