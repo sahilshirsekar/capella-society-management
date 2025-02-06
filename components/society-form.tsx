@@ -163,6 +163,19 @@ export default function SocietyRegistration() {
     }
   };
 
+  async function getSociety() {
+    try {
+      const response = await fetch('/api/society'); // Adjust the endpoint as per your Next.js API route
+      if (!response.ok) {
+        throw new Error('Failed to fetch society');
+      }
+      const data = await response.json();
+      console.log(data.users);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  }
+
   const onSubmit = async (data: any) => {
     try {
       const response = await fetch("/api/society", {
@@ -179,6 +192,7 @@ export default function SocietyRegistration() {
           description: "Login details have been sent to committee members.",
           className: "bg-green-500"
         });
+        
       } else {
         toast({
           title: "Registration Failed",

@@ -14,7 +14,7 @@ export default async function () {
 
   return (
     <div>
-      <h1 className="text-2xl font-extrabold p-5">Society List</h1>
+      <h1 className="text-2xl font-extrabold p-5">Society details</h1>
       {societies.length === 0 ? (
         <p>No societies found.</p>
       ) : (
@@ -50,10 +50,8 @@ export default async function () {
                             <CardTitle className="text-sm font-medium">
                             {member.role}
                             </CardTitle>
-                            {/* <DollarSign className="h-4 w-4 text-muted-foreground" /> */}
                           </CardHeader>
                           <CardContent>
-
                           {member.name}  
                           <p> Email: {member.email}</p>
                           <p>Phone No. : {member.phone}</p>

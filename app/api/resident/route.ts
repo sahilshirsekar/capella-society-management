@@ -61,7 +61,7 @@ export async function POST(req: Request) {
 
 Welcome to RamRajya Society Management! Below are your account details:
 
-- Room ID: 
+- Room ID: ${parsedBody.roomId}
 - Email: ${parsedBody.email}
 - Temporary Password: ${tempPassword}
 

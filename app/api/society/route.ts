@@ -64,6 +64,22 @@ type Building = z.infer<typeof buildingSchema>;
 type Member = z.infer<typeof memberSchema>;
 type Society = z.infer<typeof societySchema>;
 
+export async function GET() {
+  try {
+    const societies = await db.society.findMany();
+    return NextResponse.json({ societies }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message: "Something went wrong",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body: unknown = await req.json(); // Ensure unknown type before validation
