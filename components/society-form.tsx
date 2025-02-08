@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 import { Button } from "./ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { useState, useEffect } from "react"
-import { SocietyDetails } from "./society-details"
+import {SocietyDetails} from "./society-details"
 
 type Room = {
   number: string
@@ -199,7 +199,7 @@ export default function SocietyRegistration() {
 
   useEffect(() => {
     getSociety()
-  }, [getSociety])
+  }, [])
 
   const onSubmit: SubmitHandler<Society> = async (data: Society) => {
     try {

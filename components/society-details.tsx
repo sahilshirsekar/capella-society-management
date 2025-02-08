@@ -85,6 +85,16 @@ export function SocietyDetails({ society, onUpdate }: SocietyDetailsProps) {
     defaultValues: society,
   });
 
+  const { fields: buildingFields } = useFieldArray({
+    control,
+    name: "buildings",
+  });
+
+  const { fields: memberFields } = useFieldArray({
+    control,
+    name: "members",
+  });
+
   const onSubmit = async (data: Society) => {
     try {
       const response = await fetch(`/api/society/${society.id}`, {
@@ -112,12 +122,82 @@ export function SocietyDetails({ society, onUpdate }: SocietyDetailsProps) {
 
   return isEditing ? (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <input
-        {...register("name")}
-        className="input-field"
-        placeholder="Society Name"
-      />
-      {errors.name && <p className="error">{errors.name.message}</p>}
+      <div>
+        <label>Society Name</label>
+        <input {...register("name")} className="input-field" />
+        {errors.name && <p className="error">{errors.name.message}</p>}
+      </div>
+
+      <div>
+        <label>Society Number</label>
+        <input {...register("societyNumber")} className="input-field" />
+        {errors.societyNumber && (
+          <p className="error">{errors.societyNumber.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label>Address</label>
+        <input {...register("address")} className="input-field" />
+        {errors.address && <p className="error">{errors.address.message}</p>}
+      </div>
+
+      <div>
+        <label>Pin Code</label>
+        <input {...register("pinCode")} className="input-field" />
+        {errors.pinCode && <p className="error">{errors.pinCode.message}</p>}
+      </div>
+
+      <div>
+        <label>Email</label>
+        <input {...register("email")} className="input-field" />
+        {errors.email && <p className="error">{errors.email.message}</p>}
+      </div>
+
+      <div>
+        <label>Phone</label>
+        <input {...register("phone")} className="input-field" />
+        {errors.phone && <p className="error">{errors.phone.message}</p>}
+      </div>
+
+      <div>
+        <label>Logo URL</label>
+        <input {...register("logo")} className="input-field" />
+        {errors.logo && <p className="error">{errors.logo.message}</p>}
+      </div>
+
+      <div>
+        <label>Buildings</label>
+        {buildingFields.map((building, index) => (
+          <div key={building.id}>
+            <input
+              {...register(`buildings.${index}.name`)}
+              className="input-field"
+              placeholder="Building Name"
+            />
+            {errors.buildings?.[index]?.name && (
+              <p className="error">{errors.buildings[index]?.name?.message}</p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div>
+        <label>Members</label>
+        {memberFields.map((member, index) => (
+          <div key={member.id}>
+            <input
+              {...register(`members.${index}.name`)}
+              className="input-field"
+              placeholder="Member Name"
+            />
+            {errors.members?.[index]?.name && (
+              <p className="error">{errors.members[index]?.name?.message}</p>
+            )}
+          </div>
+        ))}
+      </div>
+
       <div className="space-x-4">
         <Button type="submit">Save Changes</Button>
         <Button
@@ -131,21 +211,49 @@ export function SocietyDetails({ society, onUpdate }: SocietyDetailsProps) {
     </form>
   ) : (
     <div className="space-y-8">
-      <p>
-        <strong>Name:</strong> {society.name}
-      </p>
-      <p>
-        <strong>Society No. </strong>
-        {society.societyNumber}
-      </p>
       <Card key={society.id} className="pr-20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{society.name}</CardTitle>
+          <CardTitle className="text-xl font-medium">
+            <p>
+              <strong>Name:</strong> {society.name}
+            </p>
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p> Society No. {society.societyNumber}</p>
-          <p> Email: {society.email}</p>
-          <p>Phone No. : {society.phone}</p>
+        <CardContent className="text-lg">
+          <p>
+            <strong>Society No.:</strong> {society.societyNumber}
+          </p>
+          <p>
+            <strong>Email:</strong> {society.email}
+          </p>
+          <p>
+            <strong>Phone No.:</strong> {society.phone}
+          </p>
+          <p>
+            <strong>Address:</strong> {society.address}
+          </p>
+          <p>
+            <strong>Pin Code:</strong> {society.pinCode}
+          </p>
+          <p>
+            <strong>Logo:</strong> {society.logo}
+          </p>
+          <p>
+            <strong>Buildings:</strong>
+            {society.buildings?.map((building) => (
+              <div key={building.id}>
+                <p>{building.name}</p>
+              </div>
+            ))}
+          </p>
+          <p>
+            <strong>Members:</strong>
+            {society.members?.map((member) => (
+              <div key={member.id}>
+                <p>{member.name}</p>
+              </div>
+            ))}
+          </p>
         </CardContent>
       </Card>
       <Button onClick={() => setIsEditing(true)}>Edit Details</Button>
