@@ -89,15 +89,17 @@ export function SocietyDetails({ society, onUpdate }: SocietyDetailsProps) {
     control,
     name: "buildings",
   });
+  console.log(buildingFields);
 
   const { fields: memberFields } = useFieldArray({
     control,
     name: "members",
   });
+  console.log(memberFields);
 
   const onSubmit = async (data: Society) => {
     try {
-      const response = await fetch(`/api/society/${society.id}`, {
+      const response = await fetch(`/api/society?id=${society.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -169,7 +171,7 @@ export function SocietyDetails({ society, onUpdate }: SocietyDetailsProps) {
       <div>
         <label>Buildings</label>
         {buildingFields.map((building, index) => (
-          <div key={building.id}>
+          <div key={building.id || index}>
             <input
               {...register(`buildings.${index}.name`)}
               className="input-field"
@@ -181,7 +183,6 @@ export function SocietyDetails({ society, onUpdate }: SocietyDetailsProps) {
           </div>
         ))}
       </div>
-
       <div>
         <label>Members</label>
         {memberFields.map((member, index) => (
