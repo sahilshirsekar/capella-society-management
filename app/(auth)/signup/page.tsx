@@ -2,9 +2,6 @@ import SignUpForm from "@/components/form/signup";
 
 export default function(){
   return (
-  //  <div className='w-full'>
-  //     <SignUpForm />
-  //   </div>
     <div className="grid min-h-svh lg:grid-cols-2">
           <div className="flex flex-col gap-4 p-6 md:p-10">
             <div className="flex justify-center gap-2 md:justify-start">

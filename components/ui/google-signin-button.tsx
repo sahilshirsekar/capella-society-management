@@ -12,7 +12,7 @@ const GoogleSignInButton: FC<GoogleSignInButtonProps> = ({ children }) => {
     try {
       setIsLoading(true);
       await signIn("google", {
-        callbackUrl: `${window.location.origin}/dashboard`,
+        callbackUrl: `${window.location.origin}/admin/dashboard`,
       });
     } catch (error) {
       setIsLoading(false);

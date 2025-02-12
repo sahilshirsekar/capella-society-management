@@ -39,7 +39,7 @@ import { authOptions } from "@/lib/auth"
 import { useSession } from "next-auth/react"
 
 const menuItems = [
-  { icon: Home, label: "Dashboard", href: "./dashboard"
+  { icon: Home, label: "Dashboard", href: "./admin/dashboard"
     // ,subItems: [
     // { icon: LineChart, label: "Overview", href: "/analytics/overview" },
     // { icon: PieChart, label: "Activity log", href: "/analytics/activity" },

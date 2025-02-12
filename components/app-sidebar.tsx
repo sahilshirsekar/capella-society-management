@@ -176,7 +176,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
     <Sidebar variant="floating" collapsible="icon" {...props}>
       <SidebarHeader>
         <Link href="">
-          <img src="./landing/logo.png" alt="Logo" />
+          <img src="/landing/logo.png" alt="Logo" />
         </Link>
       </SidebarHeader>
       <SidebarContent>

@@ -1,39 +1,50 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const router = useRouter()
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     const response = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-    })
+    });
 
     if (response.ok) {
-      const data = await response.json()
-      localStorage.setItem("accessToken", data.accessToken)
-      localStorage.setItem("refreshToken", data.refreshToken)
-      localStorage.setItem("user", JSON.stringify(data.user))
+      const data = await response.json();
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      toast({
+        title: data.message || "Resident logged in successfully!",
+        className: "bg-green-500 text-white",
+      });
 
       if (data.isFirstLogin) {
-        router.push("/first-login")
+        router.push("/member/first-login");
       } else {
-        router.push("/member-dashboard")
+        router.push("/member/dashboard");
       }
     } else {
-      setError("Invalid email or password")
+      setError("Invalid email or password");
+      toast({
+        title: "Invalid login credentials",
+        variant: "destructive",
+      });
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -71,12 +82,11 @@ export default function LoginForm() {
       <div>
         <button
           type="submit"
-          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-customBg hover:bg-hoverBg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Log in
         </button>
       </div>
     </form>
-  )
+  );
 }
-

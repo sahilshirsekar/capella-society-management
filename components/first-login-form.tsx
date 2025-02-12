@@ -44,7 +44,7 @@ export default function FirstLoginForm() {
       localStorage.setItem("user", JSON.stringify(data.user))
       // Set isFirstLogin to false in localStorage
       localStorage.setItem("isFirstLogin", "false")
-      router.push("/dashboard")
+      router.push("/member/dashboard")
     } else {
       setError("Failed to update profile")
     }
