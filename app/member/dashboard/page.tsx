@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
 // import { useEffect, useState } from "react"
 // import { useRouter } from "next/navigation"
 
 // export default function DashboardPage() {
-//   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
-//   const router = useRouter()
+  // const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  // const router = useRouter()
 
-//   useEffect(() => {
-//     const userStr = localStorage.getItem("user")
-//     const isFirstLogin = localStorage.getItem("isFirstLogin")
+  // useEffect(() => {
+  //   const userStr = localStorage.getItem("user")
+  //   const isFirstLogin = localStorage.getItem("isFirstLogin")
 
-//     if (userStr) {
-//       setUser(JSON.parse(userStr))
-//       if (isFirstLogin === "true") {
-//         router.push("/member/first-login")
-//       }
-//     } else {
-//       router.push("/member/login")
-//     }
-//   }, [router])
+  //   if (userStr) {
+  //     setUser(JSON.parse(userStr))
+  //     if (isFirstLogin === "true") {
+  //       router.push("/member/first-login")
+  //     }
+  //   } else {
+  //     router.push("/member/login")
+  //   }
+  // }, [router])
 
-//   if (!user) {
-//     return <div>Loading...</div>
-//   }
+  // if (!user) {
+  //   return <div>Loading...</div>
+  // }
 
 //   return (
 //     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -38,7 +38,6 @@
 //   )
 // }
 
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VisitorBarChart } from "@/components/ui/bar-chart";
 import { BarChart2, Users, DollarSign, ShoppingCart } from "lucide-react";
@@ -52,10 +51,7 @@ import { authOptions } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
-
-export default async function DashboardPage() {
-
-
+export default  function DashboardPage() {
   const overviews = [
     {
       id: 1,
@@ -64,7 +60,7 @@ export default async function DashboardPage() {
     },
     {
       id: 2,
-      title: "Maintainance Collected",
+      title: "Maintenance Collected",
       numbers: "₹55000",
     },
     {
@@ -85,12 +81,25 @@ export default async function DashboardPage() {
   ];
 
   const activities = [
-    { id: 1, user: 'Admin', action: 'Posted a new notice', timestamp: '5 mins ago' },
-    { id: 2, user: 'Guard', action: 'Logged a visitor entry', timestamp: '10 mins ago' },
-    { id: 3, user: 'Member', action: 'Paid maintenance fee', timestamp: '1 hour ago' },
+    {
+      id: 1,
+      user: "Admin",
+      action: "Posted a new notice",
+      timestamp: "5 mins ago",
+    },
+    {
+      id: 2,
+      user: "Guard",
+      action: "Logged a visitor entry",
+      timestamp: "10 mins ago",
+    },
+    {
+      id: 3,
+      user: "Member",
+      action: "Paid maintenance fee",
+      timestamp: "1 hour ago",
+    },
   ];
-
-  
 
   return (
     <div className="flex flex-col gap-5">
@@ -121,6 +130,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-
-
-

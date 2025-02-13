@@ -1,6 +1,5 @@
-
-
-import * as React from "react"
+// 'use client'
+import type * as React from "react";
 import {
   AudioWaveform,
   BookOpen,
@@ -12,22 +11,20 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/ui/nav-main"
-import { NavProjects } from "@/components/ui/nav-projects"
-import { NavUser } from "@/components/ui/nav-user"
-import { TeamSwitcher } from "@/components/ui/team-switcher"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+} from "@/components/ui/sidebar";
+import { TeamSwitcher } from "./ui/team-switcher";
+import { NavMain } from "./ui/nav-main";
+import { NavProjects } from "./ui/nav-projects";
+import { NavUser } from "./ui/member-nav-user";
+import Link from "next/link";
 
 // This is sample data.
 const data = {
@@ -57,7 +54,7 @@ const data = {
     {
       title: "Society Control",
       url: "",
-      icon: '/landing/analytics.png'     ,
+      icon: "/landing/analytics.png",
       isActive: true,
       items: [
         {
@@ -77,7 +74,7 @@ const data = {
     {
       title: "Models",
       url: "#",
-      icon: '/landing/analytics.png' ,
+      icon: "/landing/analytics.png",
       items: [
         {
           title: "Genesis",
@@ -96,7 +93,7 @@ const data = {
     {
       title: "Documentation",
       url: "#",
-      icon: '/landing/analytics.png' ,
+      icon: "/landing/analytics.png",
       items: [
         {
           title: "Introduction",
@@ -119,7 +116,7 @@ const data = {
     {
       title: "Settings",
       url: "#",
-      icon: '/landing/analytics.png' ,
+      icon: "/landing/analytics.png",
       items: [
         {
           title: "General",
@@ -157,33 +154,23 @@ const data = {
       // icon: Map,
     },
   ],
-}
+};
 
-export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const session = await getServerSession(authOptions);
-
-  // Ensure user properties are not `null`
-  const safeUser = session?.user
-    ? {
-        name: session.user.name ?? undefined,
-        email: session.user.email ?? undefined,
-        avatar: session.user.image ?? undefined, // Ensure consistency with `NavUser` props
-        username: session.user.username ?? undefined
-      }
-    : data.user;
-
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar variant="floating" collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <Link href="">
-          <img src="/landing/logo.png" alt="Logo" />
+        {/* <TeamSwitcher teams={data.teams} /> */}
+        <Link href={"#"}>
+          <img src="/landing/logo.png" alt="logo" />
         </Link>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={safeUser} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

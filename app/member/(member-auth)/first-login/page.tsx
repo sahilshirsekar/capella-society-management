@@ -1,6 +1,4 @@
 import FirstLoginForm from "@/components/first-login-form";
-import Image from "next/image";
-import logo from "../../public/logo.png"
 
 export default function FirstLoginPage() {
   return (
@@ -9,7 +7,6 @@ export default function FirstLoginPage() {
         <div className="flex flex-coljustify-center gap-2 md:justify-start">
           <a href="#" className="flex items-center gap-2 font-medium">
             <div className="flex h-20 w-32 items-center justify-center rounded-md  mx-10 text-primary-foreground">
-              {/* <Image src={logo} alt="Logo" className="w-full" /> */}
               <img src="/landing/logo.png" alt="logo" className="w-full  " />
             </div>
           </a>
@@ -26,9 +23,7 @@ export default function FirstLoginPage() {
       <div className="relative hidden lg:block ">
         <div className="flex h-full w-full items-center justify-center rounded-none mx-10 text-primary-foreground">
           <img src="/landing/logo.png" alt="logo" className="w-full  pr-40" />
-          {/* <Image src={logo} alt="Logo" className="w-full" ></Image> */}
         </div>
-
       </div>
     </div>
   );

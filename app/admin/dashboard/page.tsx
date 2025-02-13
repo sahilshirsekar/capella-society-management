@@ -9,10 +9,7 @@ import { ActivityFeed } from "@/components/activity-feed";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-
 export default async function DashboardPage() {
-
-
   const overviews = [
     {
       id: 1,
@@ -21,7 +18,7 @@ export default async function DashboardPage() {
     },
     {
       id: 2,
-      title: "Maintainance Collected",
+      title: "Maintenance Collected",
       numbers: "₹55000",
     },
     {
@@ -42,11 +39,25 @@ export default async function DashboardPage() {
   ];
 
   const activities = [
-    { id: 1, user: 'Admin', action: 'Posted a new notice', timestamp: '5 mins ago' },
-    { id: 2, user: 'Guard', action: 'Logged a visitor entry', timestamp: '10 mins ago' },
-    { id: 3, user: 'Member', action: 'Paid maintenance fee', timestamp: '1 hour ago' },
+    {
+      id: 1,
+      user: "Admin",
+      action: "Posted a new notice",
+      timestamp: "5 mins ago",
+    },
+    {
+      id: 2,
+      user: "Guard",
+      action: "Logged a visitor entry",
+      timestamp: "10 mins ago",
+    },
+    {
+      id: 3,
+      user: "Member",
+      action: "Paid maintenance fee",
+      timestamp: "1 hour ago",
+    },
   ];
-
 
   return (
     <div className="flex flex-col gap-5">
