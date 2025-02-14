@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 
 export default function FirstLoginForm() {
   const [name, setName] = useState("")
@@ -10,6 +11,7 @@ export default function FirstLoginForm() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [profilePicture, setProfilePicture] = useState<File | null>(null)
   const [error, setError] = useState("")
+  const {toast} = useToast();
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,9 +46,17 @@ export default function FirstLoginForm() {
       localStorage.setItem("user", JSON.stringify(data.user))
       // Set isFirstLogin to false in localStorage
       localStorage.setItem("isFirstLogin", "false")
+      toast({
+        title: "Profile updated successfully!",
+        className: "bg-green-500 text-white",
+      });
       router.push("/member/dashboard")
     } else {
       setError("Failed to update profile")
+      toast({
+        title: "Profile update failed",
+        variant: "destructive",
+      });
     }
   }
 

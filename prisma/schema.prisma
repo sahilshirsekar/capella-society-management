@@ -17,7 +17,6 @@ generator erd {
   provider = "prisma-erd-generator"
 }
 
-
 model Account {
   id                String  @id @default(cuid())
   userId            String  @map("user_id")
@@ -109,16 +108,18 @@ enum Role {
 }
 
 model Resident {
-  id        String   @id @default(cuid())
-  societyId String
-  society   Society  @relation(fields: [societyId], references: [id], onDelete: Cascade)
-  roomId    String?  @unique
-  room      Room?    @relation(fields: [roomId], references: [id]) // Define relation here
-  name      String
-  email     String   @unique
-  phone     String
-  password  String
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  societyId    String
+  society      Society  @relation(fields: [societyId], references: [id], onDelete: Cascade)
+  roomId       String?  @unique
+  room         Room?    @relation(fields: [roomId], references: [id]) // Define relation here
+  name         String
+  email        String   @unique
+  phone        String
+  password     String
+  isFirstLogin Boolean  @default(true)
+  refreshToken String?
+  createdAt    DateTime @default(now())
 }
 
 model Building {

@@ -1,54 +1,67 @@
-"use client"
-import { useForm, Controller, type SubmitHandler } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { motion } from "framer-motion"
-import { Button } from "./ui/button"
-import { useToast } from "@/hooks/use-toast"
-import { useState, useEffect } from "react"
-import {SocietyDetails} from "./society-details"
+"use client";
+import { useForm, Controller, type SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
+import { Button } from "./ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
+import { SocietyDetails } from "./society-details";
 
 type Room = {
-  number: string
-}
+  number: string;
+};
 
 type Floor = {
-  number: string
-  rooms: Room[]
-}
+  number: string;
+  rooms: Room[];
+};
 
 type Building = {
-  name: string
-  floors: Floor[]
-}
+  name: string;
+  floors: Floor[];
+};
 
-type Role = "PRESIDENT" | "VICE_PRESIDENT" | "TREASURER" | "ASSISTANT_TREASURER" | "SECRETARY" | "MEMBER"
+type Role =
+  | "PRESIDENT"
+  | "VICE_PRESIDENT"
+  | "TREASURER"
+  | "ASSISTANT_TREASURER"
+  | "SECRETARY"
+  | "MEMBER";
 
 type Member = {
-  name: string
-  email: string
-  phone: string
-  role: Role
-}
+  name: string;
+  email: string;
+  phone: string;
+  role: Role;
+};
 
 type Society = {
-  id: string
-  name: string
-  societyNumber: string
-  address: string
-  pinCode: string
-  email: string
-  phone: string
-  logo?: string
-  buildings: Building[]
-  members: Member[]
-}
+  name: string;
+  societyNumber: string;
+  address: string;
+  pinCode: string;
+  email: string;
+  phone: string;
+  logo?: string;
+  buildings: Building[];
+  members: Member[];
+};
 
 // Define committee member roles
-const memberRoles = ["PRESIDENT", "VICE_PRESIDENT", "TREASURER", "ASSISTANT_TREASURER", "SECRETARY", "MEMBER"] as const
+const memberRoles = [
+  "PRESIDENT",
+  "VICE_PRESIDENT",
+  "TREASURER",
+  "ASSISTANT_TREASURER",
+  "SECRETARY",
+  "MEMBER",
+] as const;
 
 // Zod validation schema
 const societySchema = z.object({
+  id: z.string().optional(), // Add this line
   name: z.string().min(3, "Society name must be at least 3 characters long"),
   societyNumber: z.string().min(3, "Society number is required"),
   address: z.string().min(5, "Address must be at least 5 characters long"),
@@ -63,25 +76,27 @@ const societySchema = z.object({
         z.object({
           number: z.string(),
           rooms: z.array(z.object({ number: z.string() })),
-        }),
+        })
       ),
-    }),
+    })
   ),
   members: z
     .array(
       z.object({
-        name: z.string().min(3, "Member name must be at least 3 characters long"),
+        name: z
+          .string()
+          .min(3, "Member name must be at least 3 characters long"),
         email: z.string().email("Invalid email format"),
         phone: z.string().length(10, "Phone number must be exactly 10 digits"),
         role: z.enum(memberRoles),
-      }),
+      })
     )
     .min(5, "At least 5 committee members are required")
     .max(10, "Maximum 10 committee members allowed"),
-})
+});
 
 export default function SocietyRegistration() {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -100,150 +115,166 @@ export default function SocietyRegistration() {
       email: "",
       phone: "",
       logo: "",
-      buildings: [{ name: "", floors: [{ number: "", rooms: [{ number: "" }] }] }],
+      buildings: [
+        { name: "", floors: [{ number: "", rooms: [{ number: "" }] }] },
+      ],
       members: [
-        { name: "", email: "", phone: "", role: "PRESIDENT" },
-        { name: "", email: "", phone: "", role: "VICE_PRESIDENT" },
-        { name: "", email: "", phone: "", role: "TREASURER" },
-        { name: "", email: "", phone: "", role: "ASSISTANT_TREASURER" },
-        { name: "", email: "", phone: "", role: "SECRETARY" },
+        { name: "", email: "", phone: "", role: "PRESIDENT" as Role },
+        { name: "", email: "", phone: "", role: "VICE_PRESIDENT" as Role},
+        { name: "", email: "", phone: "", role: "TREASURER" as Role},
+        { name: "", email: "", phone: "", role: "ASSISTANT_TREASURER" as Role},
+        { name: "", email: "", phone: "", role: "SECRETARY" as Role},
       ],
     },
-  })
+  });
 
-  const buildings = watch("buildings")
+  const buildings = watch("buildings");
 
   const addBuilding = (): void => {
     if (buildings.length < 10) {
-      setValue("buildings", [...buildings, { name: "", floors: [{ number: "", rooms: [{ number: "" }] }] }])
+      setValue("buildings", [
+        ...buildings,
+        { name: "", floors: [{ number: "", rooms: [{ number: "" }] }] },
+      ]);
     }
-  }
+  };
 
   const removeBuilding = (index: number): void => {
     if (buildings.length > 1) {
       setValue(
         "buildings",
-        buildings.filter((_, i) => i !== index),
-      )
+        buildings.filter((_, i) => i !== index)
+      );
     }
-  }
+  };
 
   const addFloor = (buildingIndex: number): void => {
     setValue(`buildings.${buildingIndex}.floors`, [
       ...buildings[buildingIndex].floors,
       { number: "", rooms: [{ number: "" }] },
-    ])
-  }
+    ]);
+  };
 
   const removeFloor = (buildingIndex: number, floorIndex: number): void => {
     if (buildings[buildingIndex].floors.length > 1) {
       setValue(
         `buildings.${buildingIndex}.floors`,
-        buildings[buildingIndex].floors.filter((_, i) => i !== floorIndex),
-      )
+        buildings[buildingIndex].floors.filter((_, i) => i !== floorIndex)
+      );
     }
-  }
+  };
 
   const addRoom = (buildingIndex: number, floorIndex: number): void => {
     setValue(`buildings.${buildingIndex}.floors.${floorIndex}.rooms`, [
       ...buildings[buildingIndex].floors[floorIndex].rooms,
       { number: "" },
-    ])
-  }
+    ]);
+  };
 
-  const removeRoom = (buildingIndex: number, floorIndex: number, roomIndex: number): void => {
+  const removeRoom = (
+    buildingIndex: number,
+    floorIndex: number,
+    roomIndex: number
+  ): void => {
     if (buildings[buildingIndex].floors[floorIndex].rooms.length > 1) {
       setValue(
         `buildings.${buildingIndex}.floors.${floorIndex}.rooms`,
-        buildings[buildingIndex].floors[floorIndex].rooms.filter((_, i) => i !== roomIndex),
-      )
+        buildings[buildingIndex].floors[floorIndex].rooms.filter(
+          (_, i) => i !== roomIndex
+        )
+      );
     }
-  }
+  };
 
-  const members = watch("members")
+  const members = watch("members");
 
   const addMember = (): void => {
     if (members.length < 10) {
-      setValue("members", [...members, { name: "", email: "", phone: "", role: "MEMBER" }])
+      setValue("members", [
+        ...members,
+        { name: "", email: "", phone: "", role: "MEMBER" },
+      ]);
     }
-  }
+  };
 
   const removeMember = (index: number): void => {
     if (members.length > 5) {
       setValue(
         "members",
-        members.filter((_, i) => i !== index),
-      )
+        members.filter((_, i) => i !== index)
+      );
     }
-  }
+  };
 
-  const [registeredSociety, setRegisteredSociety] = useState<Society | null>(null)
+  const [registeredSociety, setRegisteredSociety] = useState<Society | null>(
+    null
+  );
 
   async function getSociety() {
     try {
-      const response = await fetch("/api/society")
+      const response = await fetch("/api/society");
       if (!response.ok) {
-        throw new Error("Failed to fetch society")
+        throw new Error("Failed to fetch society");
       }
-      const data: { societies: Society[] } = await response.json()
-      setRegisteredSociety(data.societies[0]) // Assuming we're only dealing with one society
+      const data: { societies: Society[] } = await response.json();
+      setRegisteredSociety(data.societies[0]); // Assuming we're only dealing with one society
     } catch (error) {
-      console.error("Error fetching society:", error)
+      console.error("Error fetching society:", error);
       toast({
         title: "Failed to fetch society details",
         description: "Please try again later.",
         variant: "destructive",
-      })
+      });
     }
   }
 
   useEffect(() => {
-    getSociety()
-  }, [])
+    getSociety();
+  }, []);
 
   const onSubmit: SubmitHandler<Society> = async (data: Society) => {
     try {
       const formattedMembers = data.members.map((member) => ({
         ...member,
         role: member.role.toUpperCase() as Role,
-      }))
+      }));
 
       const formattedData = {
         ...data,
         members: formattedMembers,
-      }
+      };
 
       const response = await fetch("/api/society", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formattedData),
-      })
+      });
 
-      const result = await response.json()
-      console.log(result)
+      const result = await response.json();
+      console.log(result);
       if (response.ok) {
         toast({
           title: "Society Registered Successfully!",
           description: "Login details have been sent to committee members.",
           className: "bg-green-500",
-        })
-        getSociety() // Fetch the newly registered society
+        });
+        getSociety(); // Fetch the newly registered society
       } else {
         toast({
           title: "Registration Failed",
           description: result.message || "Something went wrong",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
-      console.error("Error submitting form:", error)
+      console.error("Error submitting form:", error);
       toast({
         title: "Failed to register society",
         description: "Please try again later.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
@@ -255,25 +286,59 @@ export default function SocietyRegistration() {
         {registeredSociety ? (
           <SocietyDetails society={registeredSociety} onUpdate={getSociety} />
         ) : (
-          <form onSubmit={handleSubmit(() => {onSubmit})} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* <input type="hidden" {...register("id")} className="input-field"/> */}
-            <input {...register("name")} placeholder="Society Name" className="input-field" />
+            <input
+              {...register("name")}
+              placeholder="Society Name"
+              className="input-field"
+            />
             {errors.name && <p className="error">{errors.name.message}</p>}
-            <input {...register("societyNumber")} placeholder="Society Number" className="input-field" />
-            {errors.societyNumber && <p className="error">{errors.societyNumber.message}</p>}
+            <input
+              {...register("societyNumber")}
+              placeholder="Society Number"
+              className="input-field"
+            />
+            {errors.societyNumber && (
+              <p className="error">{errors.societyNumber.message}</p>
+            )}
 
-            <input {...register("address")} placeholder="Address" className="input-field" />
-            {errors.address && <p className="error">{errors.address.message}</p>}
+            <input
+              {...register("address")}
+              placeholder="Address"
+              className="input-field"
+            />
+            {errors.address && (
+              <p className="error">{errors.address.message}</p>
+            )}
 
-            <input {...register("pinCode")} placeholder="Pin Code" className="input-field" />
-            {errors.pinCode && <p className="error">{errors.pinCode.message}</p>}
+            <input
+              {...register("pinCode")}
+              placeholder="Pin Code"
+              className="input-field"
+            />
+            {errors.pinCode && (
+              <p className="error">{errors.pinCode.message}</p>
+            )}
 
-            <input {...register("email")} placeholder="Email" className="input-field" />
+            <input
+              {...register("email")}
+              placeholder="Email"
+              className="input-field"
+            />
             {errors.email && <p className="error">{errors.email.message}</p>}
 
-            <input {...register("phone")} placeholder="Phone" className="input-field" />
+            <input
+              {...register("phone")}
+              placeholder="Phone"
+              className="input-field"
+            />
             {errors.phone && <p className="error">{errors.phone.message}</p>}
-            <input {...register("logo")} placeholder="Logo URL" className="input-field" />
+            <input
+              {...register("logo")}
+              placeholder="Logo URL"
+              className="input-field"
+            />
             {errors.logo && <p className="error">{errors.logo.message}</p>}
 
             <div>
@@ -285,14 +350,18 @@ export default function SocietyRegistration() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <h3 className="font-semibold text-lg text-[#613EEA]">Building No. : {buildingIndex + 1}</h3>
+                  <h3 className="font-semibold text-lg text-[#613EEA]">
+                    Building No. : {buildingIndex + 1}
+                  </h3>
                   <input
                     {...register(`buildings.${buildingIndex}.name`)}
                     placeholder="Building Name"
                     className="input-field"
                   />
                   {errors.buildings?.[buildingIndex]?.name && (
-                    <p className="error">{errors.buildings[buildingIndex].name?.message}</p>
+                    <p className="error">
+                      {errors.buildings[buildingIndex].name?.message}
+                    </p>
                   )}
 
                   {building.floors.map((floor, floorIndex) => (
@@ -303,14 +372,24 @@ export default function SocietyRegistration() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <h4 className="font-semibold  text-[#613EEA]">Floor No. : {floorIndex + 1}</h4>
+                      <h4 className="font-semibold  text-[#613EEA]">
+                        Floor No. : {floorIndex + 1}
+                      </h4>
                       <input
-                        {...register(`buildings.${buildingIndex}.floors.${floorIndex}.number`)}
+                        {...register(
+                          `buildings.${buildingIndex}.floors.${floorIndex}.number`
+                        )}
                         placeholder="Floor Number"
                         className="input-field"
                       />
-                      {errors.buildings?.[buildingIndex]?.floors?.[floorIndex]?.number && (
-                        <p className="error">{errors.buildings[buildingIndex].floors[floorIndex].number?.message}</p>
+                      {errors.buildings?.[buildingIndex]?.floors?.[floorIndex]
+                        ?.number && (
+                        <p className="error">
+                          {
+                            errors.buildings[buildingIndex].floors[floorIndex]
+                              .number?.message
+                          }
+                        </p>
                       )}
 
                       {floor.rooms.map((room, roomIndex) => (
@@ -322,14 +401,18 @@ export default function SocietyRegistration() {
                           transition={{ duration: 0.1 }}
                         >
                           <input
-                            {...register(`buildings.${buildingIndex}.floors.${floorIndex}.rooms.${roomIndex}.number`)}
+                            {...register(
+                              `buildings.${buildingIndex}.floors.${floorIndex}.rooms.${roomIndex}.number`
+                            )}
                             placeholder="Room Number"
                             className="input-field flex-grow"
                           />
                           {floor.rooms.length > 1 && (
                             <Button
                               type="button"
-                              onClick={() => removeRoom(buildingIndex, floorIndex, roomIndex)}
+                              onClick={() =>
+                                removeRoom(buildingIndex, floorIndex, roomIndex)
+                              }
                               variant="destructive"
                               size="sm"
                             >
@@ -351,7 +434,9 @@ export default function SocietyRegistration() {
                         {building.floors.length > 1 && (
                           <Button
                             type="button"
-                            onClick={() => removeFloor(buildingIndex, floorIndex)}
+                            onClick={() =>
+                              removeFloor(buildingIndex, floorIndex)
+                            }
                             variant="destructive"
                             size="sm"
                             className="mt-2"
@@ -363,7 +448,12 @@ export default function SocietyRegistration() {
                     </motion.div>
                   ))}
                   <div className="space-x-5">
-                    <Button type="button" onClick={() => addFloor(buildingIndex)} size="sm" className="mt-2">
+                    <Button
+                      type="button"
+                      onClick={() => addFloor(buildingIndex)}
+                      size="sm"
+                      className="mt-2"
+                    >
                       Add Floor
                     </Button>
 
@@ -401,16 +491,41 @@ export default function SocietyRegistration() {
                   transition={{ duration: 0.3 }}
                 >
                   <h3 className="font-semibold text-lg text-[#613EEA]">
-                    Committee Member {index + 1} ({member.role.replace("_", " ")})
+                    Committee Member {index + 1} (
+                    {member.role.replace("_", " ")})
                   </h3>
-                  <input {...register(`members.${index}.name`)} placeholder="Name" className="input-field" />
-                  {errors.members?.[index]?.name && <p className="error">{errors.members[index].name?.message}</p>}
+                  <input
+                    {...register(`members.${index}.name`)}
+                    placeholder="Name"
+                    className="input-field"
+                  />
+                  {errors.members?.[index]?.name && (
+                    <p className="error">
+                      {errors.members[index].name?.message}
+                    </p>
+                  )}
 
-                  <input {...register(`members.${index}.email`)} placeholder="Email" className="input-field" />
-                  {errors.members?.[index]?.email && <p className="error">{errors.members[index].email?.message}</p>}
+                  <input
+                    {...register(`members.${index}.email`)}
+                    placeholder="Email"
+                    className="input-field"
+                  />
+                  {errors.members?.[index]?.email && (
+                    <p className="error">
+                      {errors.members[index].email?.message}
+                    </p>
+                  )}
 
-                  <input {...register(`members.${index}.phone`)} placeholder="Phone" className="input-field" />
-                  {errors.members?.[index]?.phone && <p className="error">{errors.members[index].phone?.message}</p>}
+                  <input
+                    {...register(`members.${index}.phone`)}
+                    placeholder="Phone"
+                    className="input-field"
+                  />
+                  {errors.members?.[index]?.phone && (
+                    <p className="error">
+                      {errors.members[index].phone?.message}
+                    </p>
+                  )}
 
                   <Controller
                     name={`members.${index}.role`}
@@ -427,7 +542,11 @@ export default function SocietyRegistration() {
                   />
 
                   {index >= 5 && (
-                    <Button type="button" onClick={() => removeMember(index)} variant="destructive">
+                    <Button
+                      type="button"
+                      onClick={() => removeMember(index)}
+                      variant="destructive"
+                    >
                       Remove
                     </Button>
                   )}
@@ -445,13 +564,15 @@ export default function SocietyRegistration() {
               </Button>
             )}
 
-            <Button type="submit" className="w-full bg-green-500 hover:bg-green-600">
+            <Button
+              type="submit"
+              className="w-full bg-green-500 hover:bg-green-600"
+            >
               Register Society
             </Button>
           </form>
         )}
       </div>
     </div>
-  )
+  );
 }
-

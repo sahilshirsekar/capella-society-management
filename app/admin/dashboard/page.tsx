@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   const overviews = [
     {
       id: 1,
-      title: "Total Members",
+      title: "Total Residents",
       numbers: "60",
     },
     {

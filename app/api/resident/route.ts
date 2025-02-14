@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const parsedBody: ResidentInput = residentSchema.parse(body);
-    console.log(parsedBody)
+    console.log(parsedBody);
 
     // Check if the room is already assigned to a resident
     const existingResident = await db.resident.findUnique({
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         phone: parsedBody.phone,
         password: hashedPassword, // Save hashed temporary password
         society: {
-          connect: { id: parsedBody.societyId },  // Connect resident to an existing society by ID
+          connect: { id: parsedBody.societyId }, // Connect resident to an existing society by ID
         },
         room: {
           connect: { id: parsedBody.roomId },
@@ -74,7 +74,10 @@ RamRajya - Society Management Team`;
     await sendMail(parsedBody.email, emailSubject, emailText);
 
     return NextResponse.json(
-      { message: "Resident created successfully, and email sent.", newResident },
+      {
+        message: "Resident created successfully, and email sent.",
+        newResident,
+      },
       { status: 200 }
     );
   } catch (error) {

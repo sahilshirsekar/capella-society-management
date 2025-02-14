@@ -1,8 +1,15 @@
-"use client"
+"use client";
 
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from "lucide-react"
+import {
+  BadgeCheck,
+  Bell,
+  ChevronsUpDown,
+  CreditCard,
+  LogOut,
+  Sparkles,
+} from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,34 +18,49 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+} from "@/components/ui/dropdown-menu";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Skeleton } from "./skeleton";
 
 export function NavUser() {
-  const { isMobile } = useSidebar()
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
-  const router = useRouter()
+  const { isMobile } = useSidebar();
+  const [user, setUser] = useState<{ name: string; email: string } | null>(
+    null
+  );
+  const router = useRouter();
 
   useEffect(() => {
-    const userStr = localStorage.getItem("user")
-    const isFirstLogin = localStorage.getItem("isFirstLogin")
+    const userStr = localStorage.getItem("user");
+    const isFirstLogin = localStorage.getItem("isFirstLogin");
 
     if (userStr) {
-      setUser(JSON.parse(userStr))
+      setUser(JSON.parse(userStr));
       if (isFirstLogin === "true") {
-        router.push("/first-login")
+        router.push("/first-login");
       }
     } else {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [router])
+  }, [router]);
 
   if (!user) {
-    return <div>Loading...</div>
-  }  
-
+    return (
+      <div className="flex items-center space-x-2 p-2">
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[100px]" />
+          <Skeleton className="h-4 w-[150px]" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarMenu>
@@ -51,7 +73,9 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 {/* <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} /> */}
-                <AvatarFallback className="rounded-lg">{user.name.charAt(0)}</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {user.name.charAt(0)}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
@@ -70,7 +94,9 @@ export function NavUser() {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   {/* <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} /> */}
-                  <AvatarFallback className="rounded-lg">{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user.name.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>
@@ -109,6 +135,5 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }
-

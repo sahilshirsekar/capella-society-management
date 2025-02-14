@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { handleRefreshToken } from "@/utils/token";
 
 export default function LoginForm() {
   const { toast } = useToast();
@@ -15,6 +16,12 @@ export default function LoginForm() {
     e.preventDefault();
     setError("");
 
+    let accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      accessToken = await handleRefreshToken(); // Refresh token if missing or expired
+    }
+    
     const response = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -27,14 +34,18 @@ export default function LoginForm() {
       localStorage.setItem("refreshToken", data.refreshToken);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      toast({
-        title: data.message || "Resident logged in successfully!",
-        className: "bg-green-500 text-white",
-      });
-
       if (data.isFirstLogin) {
+        toast({
+          title: "Complete your profile before proceeding!",
+          className: "bg-customBg text-white",
+        });
         router.push("/member/first-login");
+
       } else {
+        toast({
+          title: "Resident logged in successfully!",
+          className: "bg-green-500 text-white",
+        });
         router.push("/member/dashboard");
       }
     } else {

@@ -14,7 +14,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { toast, useToast } from "@/hooks/use-toast";
-import { routeModule } from "next/dist/build/templates/pages";
+import { Skeleton } from "./ui/skeleton";
 
 // Define TypeScript interfaces
 interface Room {
@@ -29,7 +29,7 @@ interface Floor {
 
 interface Building {
   id: string;
-  societyId: string; // Add societyId to the Building interface
+  societyId: string;
   floors: Floor[];
 }
 
@@ -50,7 +50,8 @@ export default function ResidentForm() {
   const [building, setBuilding] = useState<Building | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [occupiedRooms, setOccupiedRooms] = useState<string[]>([]); // Track occupied rooms
+  const [occupiedRooms, setOccupiedRooms] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false); 
 
   const {
     register,
@@ -71,15 +72,17 @@ export default function ResidentForm() {
     const fetchBuildingData = async () => {
       try {
         setError(null);
+        setLoading(true); // Start loading
         const response = await axios.get<Building>(
           `/api/building/${buildingId}`
         );
         setBuilding(response.data);
-        // Set societyId when building data is fetched
         setValue("societyId", response.data.societyId);
       } catch (err) {
         setError("Error loading data.");
         setBuilding(null);
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
 
@@ -93,8 +96,6 @@ export default function ResidentForm() {
         title: response.data.message || "Resident created successfully!",
         className: "bg-green-500 text-white",
       });
-
-      // Add the roomId to occupied rooms only after successful creation
       setOccupiedRooms((prev) => [...prev, data.roomId]);
       setIsModalOpen(false);
       reset();
@@ -116,39 +117,52 @@ export default function ResidentForm() {
         onChange={(e) => setBuildingId(e.target.value)}
       />
       {error && <p className="text-red-500">{error}</p>}
-      {building && (
+
+      {/* Show Skeleton while loading */}
+      {loading ? (
         <div>
-          <h2 className="mt-4 text-lg font-semibold">
-            Total Rooms:{" "}
-            {building.floors.reduce(
-              (acc, floor) => acc + floor.rooms.length,
-              0
-            )}
-          </h2>
-          {building.floors.map((floor) =>
-            floor.rooms.map((room) => (
-              <div
-                key={room.id}
-                className={`p-2 border mt-2 rounded-xl ${
-                  occupiedRooms.includes(room.id) ? "bg-green-400" : ""
-                }`}
-              >
-                <p>Floor Number: {floor.number}</p>
-                <p>Room Number: {room.number}</p>
-                <Button
-                  onClick={() => {
-                    setValue("roomId", room.id);
-                    setValue("societyId", building.societyId);
-                    setIsModalOpen(true);
-                  }}
-                  className="bg-customBg hover:bg-hoverBg"
-                >
-                  Create Resident
-                </Button>
-              </div>
-            ))
-          )}
+          <Skeleton className="mt-4 w-40 h-8 mb-2" />
+          <Skeleton className="h-24 w-80 mb-2" />
+          <Skeleton className="h-24 w-80 mb-2" />
+          <Skeleton className="h-24 w-80 mb-2" />
+          <Skeleton className="h-24 w-80 mb-2" />
+          <Skeleton className="h-24 w-80 " />
         </div>
+      ) : (
+        building && (
+          <div>
+            <h2 className="mt-4 text-lg font-semibold">
+              Total Rooms:{" "}
+              {building.floors.reduce(
+                (acc, floor) => acc + floor.rooms.length,
+                0
+              )}
+            </h2>
+            {building.floors.map((floor) =>
+              floor.rooms.map((room) => (
+                <div
+                  key={room.id}
+                  className={`p-2 border mt-2 rounded-xl ${
+                    occupiedRooms.includes(room.id) ? "bg-green-400" : ""
+                  }`}
+                >
+                  <p>Floor Number: {floor.number}</p>
+                  <p>Room Number: {room.number}</p>
+                  <Button
+                    onClick={() => {
+                      setValue("roomId", room.id);
+                      setValue("societyId", building.societyId);
+                      setIsModalOpen(true);
+                    }}
+                    className="bg-customBg hover:bg-hoverBg"
+                  >
+                    Create Resident
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
+        )
       )}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -185,7 +199,9 @@ export default function ResidentForm() {
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit" className="bg-customBg hover:bg-hoverBg">Submit</Button>
+              <Button type="submit" className="bg-customBg hover:bg-hoverBg">
+                Submit
+              </Button>
             </div>
           </form>
         </DialogContent>

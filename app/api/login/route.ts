@@ -18,15 +18,19 @@ export async function POST(request: Request) {
     if (!isPasswordValid) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
-
     const accessToken = jwt.sign({ userId: resident.id, email: resident.email }, process.env.JWT_SECRET!, { expiresIn: "15m" })
 
     const refreshToken = jwt.sign({ userId: resident.id }, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d" })
 
     // In a real-world scenario, you'd store the refresh token in the database
     // and associate it with the user
+    // Store the refresh token in the database
+    await db.resident.update({
+      where: { id: resident.id },
+      data: { refreshToken },
+    });
 
-    const isFirstLogin = resident.name === null || resident.phone === null
+    const isFirstLogin = resident.isFirstLogin; 
 
     return NextResponse.json({
       accessToken,
@@ -45,4 +49,3 @@ export async function POST(request: Request) {
     await db.$disconnect()
   }
 }
-
