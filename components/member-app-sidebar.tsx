@@ -72,23 +72,23 @@ const data = {
       ],
     },
     {
-      title: "Models",
-      url: "#",
+      title: "Notices / Polls",
+      url: "/admin/communication",
       icon: "/landing/analytics.png",
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
+      // items: [
+      //   {
+      //     title: "Notices",
+      //     url: "/admin/",
+      //   },
+      //   {
+      //     title: "Explorer",
+      //     url: "#",
+      //   },
+      //   {
+      //     title: "Quantum",
+      //     url: "#",
+      //   },
+      // ],
     },
     {
       title: "Documentation",

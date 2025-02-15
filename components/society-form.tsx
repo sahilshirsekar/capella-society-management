@@ -61,7 +61,7 @@ const memberRoles = [
 
 // Zod validation schema
 const societySchema = z.object({
-  id: z.string().optional(), // Add this line
+  id: z.string().optional(),
   name: z.string().min(3, "Society name must be at least 3 characters long"),
   societyNumber: z.string().min(3, "Society number is required"),
   address: z.string().min(5, "Address must be at least 5 characters long"),
@@ -120,10 +120,10 @@ export default function SocietyRegistration() {
       ],
       members: [
         { name: "", email: "", phone: "", role: "PRESIDENT" as Role },
-        { name: "", email: "", phone: "", role: "VICE_PRESIDENT" as Role},
-        { name: "", email: "", phone: "", role: "TREASURER" as Role},
-        { name: "", email: "", phone: "", role: "ASSISTANT_TREASURER" as Role},
-        { name: "", email: "", phone: "", role: "SECRETARY" as Role},
+        { name: "", email: "", phone: "", role: "VICE_PRESIDENT" as Role },
+        { name: "", email: "", phone: "", role: "TREASURER" as Role },
+        { name: "", email: "", phone: "", role: "ASSISTANT_TREASURER" as Role },
+        { name: "", email: "", phone: "", role: "SECRETARY" as Role },
       ],
     },
   });

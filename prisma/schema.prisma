@@ -84,6 +84,8 @@ model Society {
   buildings     Building[]
   members       CommitteeMember[]
   residents     Resident[]
+  notices       Notice[]
+  polls         Poll[]
   createdAt     DateTime          @default(now())
 }
 
@@ -144,6 +146,28 @@ model Room {
   floorId  String
   floor    Floor     @relation(fields: [floorId], references: [id], onDelete: Cascade)
   resident Resident?
+}
+
+model Notice {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  attachments String[] @default([]) // Store file paths or URLs
+  expiresAt   DateTime
+  societyId   String
+  society     Society  @relation(fields: [societyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model Poll {
+  id        String   @id @default(cuid())
+  question  String
+  options   String[] // Store JSON array of options
+  votes     Json     @default("{}") // Store votes as a JSON object
+  expiresAt DateTime
+  societyId String
+  society   Society  @relation(fields: [societyId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 // model Shop {

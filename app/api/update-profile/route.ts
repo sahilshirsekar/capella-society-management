@@ -37,9 +37,7 @@ export async function POST(request: Request) {
         name,
         phone: phoneNumber,
         password: hashedPassword,
-        refreshToken: newRefreshToken, // Store new refresh token
-        // In a real-world scenario, you'd upload the profile picture to a file storage service
-        // and store the URL in the database
+        refreshToken: newRefreshToken, 
         isFirstLogin: false
       },
     })
