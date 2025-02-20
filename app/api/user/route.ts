@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Request body:", body); // Debug incoming data
+    // console.log("Request body:", body); // Debug incoming data
 
     const { email, username, password } = userSchema.parse(body); // Validate input
 

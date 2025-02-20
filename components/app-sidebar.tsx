@@ -1,10 +1,9 @@
-
-
-import * as React from "react"
+import * as React from "react";
 import {
   AudioWaveform,
   BookOpen,
   Bot,
+  ChevronDown,
   Command,
   Frame,
   GalleryVerticalEnd,
@@ -12,22 +11,24 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/ui/nav-main"
-import { NavProjects } from "@/components/ui/nav-projects"
-import { NavUser } from "@/components/ui/nav-user"
-import { TeamSwitcher } from "@/components/ui/team-switcher"
+import { NavMain } from "@/components/ui/nav-main";
+import { NavProjects } from "@/components/ui/nav-projects";
+import { NavUser } from "@/components/ui/nav-user";
+import { TeamSwitcher } from "@/components/ui/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { access } from "fs";
+import { title } from "process";
 
 // This is sample data.
 const data = {
@@ -57,13 +58,13 @@ const data = {
     {
       title: "Society Control",
       url: "",
-      icon: '/landing/analytics.png'     ,
+      icon: "/landing/analytics.png",
       isActive: true,
       items: [
-        {
-          title: "Society List",
-          url: "/admin/details",
-        },
+        // {
+        //   // title: "Society List",
+        //   // url: "/admin/details",
+        // },
         {
           title: "Society Registration",
           url: "/admin/registration",
@@ -75,91 +76,93 @@ const data = {
       ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: '/landing/analytics.png' ,
+      title: "Announcements",
+      url: "/admin/communication",
+      icon: "/landing/analytics.png",
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Notices / Polls",
+          url: "/admin/communication",
         },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
+        // {
+        //   title: "Explorer",
+        //   url: "#",
+        // },
+        // {
+        //   title: "Quantum",
+        //   url: "#",
+        // },
       ],
     },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: '/landing/analytics.png' ,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: '/landing/analytics.png' ,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
+    // {
+    //   title: "Documentation",
+    //   url: "#",
+    //   icon: "/landing/analytics.png",
+    //   items: [
+    //     {
+    //       title: "Introduction",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Get Started",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Tutorials",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Changelog",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: "/landing/analytics.png",
+    //   items: [
+    //     {
+    //       title: "General",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Team",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Billing",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Limits",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      // icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      // icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      // icon: Map,
-    },
-  ],
-}
+  // projects: [
+  //   {
+  //     name: "Design Engineering",
+  //     url: "#",
+  //     icon: PieChart,
+  //   },
+  //   {
+  //     name: "Sales & Marketing",
+  //     url: "#",
+  //     icon: PieChart,
+  //   },
+  //   {
+  //     name: "Travel",
+  //     url: "#",
+  //     icon: Map,
+  //   },
+  // ],
+};
 
-export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export async function AppSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
   const session = await getServerSession(authOptions);
 
   // Ensure user properties are not `null`
@@ -168,7 +171,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
         name: session.user.name ?? undefined,
         email: session.user.email ?? undefined,
         avatar: session.user.image ?? undefined, // Ensure consistency with `NavUser` props
-        username: session.user.username ?? undefined
+        username: session.user.username ?? undefined,
       }
     : data.user;
 
@@ -182,6 +185,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser user={safeUser} />
       </SidebarFooter>

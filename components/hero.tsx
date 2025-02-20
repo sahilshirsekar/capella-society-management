@@ -15,7 +15,6 @@ export default function Hero(){
           <p className="text-lg mb-6 mt-5"></p>
           <ButtonWithModal buttonText="Get Started" buttonClassName="bg-white items-start text-blue-600 px-6 py-3 rounded font-medium hover:bg-gray-200"/>
           <Link href="/admin/dashboard" className={buttonVariants()}>Open My Admin</Link>
-
         </div>
       </section>
   )

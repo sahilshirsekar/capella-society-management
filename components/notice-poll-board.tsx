@@ -1,8 +1,7 @@
-'use client'
+"use client";
 
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,15 +9,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Calendar } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export default function NoticePollBoard() {
+  const { data: session } = useSession();
+
   const [notices, setNotices] = useState([]);
   const [polls, setPolls] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [newNotice, setNewNotice] = useState({
     title: "",
     description: "",
     expiresAt: "",
   });
+
   const [newPoll, setNewPoll] = useState({
     question: "",
     options: "",
@@ -26,45 +30,63 @@ export default function NoticePollBoard() {
   });
 
   useEffect(() => {
-    fetchNotices();
-    fetchPolls();
+    fetchData();
   }, []);
 
-  async function fetchNotices() {
-    const response = await axios.get("/api/notices");
-    setNotices(response.data);
-  }
+  async function fetchData() {
+    try {
+      const [noticesRes, pollsRes] = await Promise.all([
+        axios.get("/api/notices"),
+        axios.get("/api/polls"),
+      ]);
 
-  async function fetchPolls() {
-    const response = await axios.get("/api/polls");
-    setPolls(response.data);
+      setNotices(noticesRes.data);
+      setPolls(pollsRes.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   }
 
   async function createNotice() {
-    await axios.post("api/notices", newNotice, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
-    setNewNotice({ title: "", description: "", expiresAt: "" });
-    fetchNotices();
+    if (!session){ 
+      console.warn("Session unavailable")
+      return
+    } ;
+    try {
+      setLoading(true);
+      await axios.post("/api/notices", newNotice);
+      setNewNotice({ title: "", description: "", expiresAt: "" });
+      fetchData();
+    } catch (error) {
+      console.error("Error creating notice:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function createPoll() {
-    await axios.post(
-      "api/polls",
-      { ...newPoll, options: newPoll.options.split(",") },
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
-    setNewPoll({ question: "", options: "", expiresAt: "" });
-    fetchPolls();
+    try {
+      setLoading(true);
+      await axios.post("/api/polls", {
+        ...newPoll,
+        options: newPoll.options.split(","),
+      });
+      setNewPoll({ question: "", options: "", expiresAt: "" });
+      fetchData();
+    } catch (error) {
+      console.error("Error creating poll:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  async function vote(pollId : any, option : any) {
-    await axios.put(
-      "/api/polls",
-      { pollId, option },
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
-    fetchPolls();
+  async function vote(pollId: string, option: string) {
+    try {
+      await axios.put("/api/polls", { pollId, option });
+      fetchData();
+    } catch (error) {
+      console.error("Error voting:", error);
+    }
   }
 
   return (
@@ -82,6 +104,7 @@ export default function NoticePollBoard() {
               <TabsTrigger value="polls">Polls</TabsTrigger>
             </TabsList>
 
+            {/* Notices Section */}
             <TabsContent value="notices" className="space-y-6">
               <Card>
                 <CardHeader>
@@ -99,7 +122,10 @@ export default function NoticePollBoard() {
                     placeholder="Description"
                     value={newNotice.description}
                     onChange={(e) =>
-                      setNewNotice({ ...newNotice, description: e.target.value })
+                      setNewNotice({
+                        ...newNotice,
+                        description: e.target.value,
+                      })
                     }
                     className="min-h-[100px]"
                   />
@@ -108,19 +134,20 @@ export default function NoticePollBoard() {
                       type="date"
                       value={newNotice.expiresAt}
                       onChange={(e) =>
-                        setNewNotice({
-                          ...newNotice,
-                          expiresAt: e.target.value,
-                        })
+                        setNewNotice({ ...newNotice, expiresAt: e.target.value })
                       }
                     />
-                    <Button onClick={createNotice}>Post Notice</Button>
+                    
+                    <Button onClick={createNotice} disabled={loading}>
+                      {loading ? "Posting..." : "Post Notice"}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
 
+              {/*  Display Notices */}
               <div className="grid gap-4">
-                {notices.map((notice : any) => (
+                {notices.map((notice: any) => (
                   <Alert key={notice.id}>
                     <AlertTitle className="text-lg font-semibold">
                       {notice.title}
@@ -137,6 +164,7 @@ export default function NoticePollBoard() {
               </div>
             </TabsContent>
 
+            {/*  Polls Section */}
             <TabsContent value="polls" className="space-y-6">
               <Card>
                 <CardHeader>
@@ -165,20 +193,23 @@ export default function NoticePollBoard() {
                         setNewPoll({ ...newPoll, expiresAt: e.target.value })
                       }
                     />
-                    <Button onClick={createPoll}>Create Poll</Button>
+                    <Button onClick={createPoll} disabled={loading}>
+                      {loading ? "Creating..." : "Create Poll"}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
 
+              {/*  Display Polls */}
               <div className="grid gap-4">
-                {polls.map((poll : any) => (
+                {polls.map((poll: any) => (
                   <Card key={poll.id}>
                     <CardHeader>
                       <CardTitle className="text-lg">{poll.question}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid gap-2">
-                        {poll.options.map((option : string, index : string) => (
+                        {poll.options.map((option: string, index: number) => (
                           <Button
                             key={index}
                             variant="outline"
@@ -187,15 +218,11 @@ export default function NoticePollBoard() {
                           >
                             <span>{option}</span>
                             <span className="text-sm text-muted-foreground">
-                              {poll.votes[option] || 0} votes
+                              {poll.votes?.[option] || 0} votes
                             </span>
                           </Button>
                         ))}
                       </div>
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        Expires on: {new Date(poll.expiresAt).toDateString()}
-                      </p>
                     </CardContent>
                   </Card>
                 ))}

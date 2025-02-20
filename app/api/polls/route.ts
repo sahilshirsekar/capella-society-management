@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { error } from "console";
 
 async function verifyToken(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -27,9 +30,14 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await verifyToken(request);
-  if (!user)
-    return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+  // const user = await verifyToken(request);
+  // if (!user)
+  //   return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const { question, options, expiresAt, societyId } = await request.json();
 
@@ -49,10 +57,11 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PUT(request: Request) { 
-  const user = await verifyToken(request);
-  if (!user)
-    return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+export async function PUT(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const { pollId, option } = await request.json();
   try {
@@ -60,7 +69,8 @@ export async function PUT(request: Request) {
       where: { id: pollId },
     });
 
-    let votes: Record<string, number> = (poll?.votes as Record<string, number>) || {};
+    let votes: Record<string, number> =
+      (poll?.votes as Record<string, number>) || {};
     votes[option] = (votes[option] || 0) + 1;
 
     const updatedPoll = await db.poll.update({

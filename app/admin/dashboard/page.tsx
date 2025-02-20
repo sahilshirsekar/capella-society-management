@@ -6,7 +6,6 @@ import { PieChartNew } from "@/components/ui/pie-chart";
 import { QuickLinkButton } from "@/components/ui/quick-link-button";
 import { QuickLinks } from "@/components/quick-links";
 import { ActivityFeed } from "@/components/activity-feed";
-import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export default async function DashboardPage() {

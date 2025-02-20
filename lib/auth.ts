@@ -4,30 +4,33 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { db } from "./db";
 import { compare } from "bcrypt";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
 export function verifyToken(token: string) {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; email: string }
+    return jwt.verify(token, process.env.JWT_SECRET!) as {
+      userId: string;
+      email: string;
+    };
   } catch (error) {
-    throw new Error("Invalid token")
+    throw new Error("Invalid token");
   }
 }
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
-  secret : process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET,
   session: {
-    strategy: "jwt", // Use JWT strategy for sessions
+    strategy: "jwt",
   },
   pages: {
-    signIn: "/signin", // Custom sign-in page
+    signIn: "/signin",
   },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!
-    }),  
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
 
     CredentialsProvider({
       name: "Credentials",
@@ -36,62 +39,56 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Check if both email and password are provided
         if (!credentials?.email || !credentials?.password) {
-          console.log("Email or password is missing.");
-          return null; // Missing credentials
+          console.log("Email or password missing.");
+          return null;
         }
 
-        // Find the user by email
         const existingUser = await db.user.findUnique({
-          where: {
-            email: credentials.email, // Use email to find the user
-          },
+          where: { email: credentials.email },
         });
 
         if (!existingUser) {
           console.log("User not found with email:", credentials.email);
-          return null; // User not found
+          return null;
         }
 
-        // Compare the provided password with the stored hashed password
-        if(existingUser.password){
+        if (existingUser.password) {
           const passwordMatch = await compare(credentials.password, existingUser.password);
           if (!passwordMatch) {
-            console.log("Password mismatch for email:", credentials.email);
-            return null; // Password mismatch
+            console.log("Incorrect password for email:", credentials.email);
+            return null;
           }
         }
 
-        // Return the user object to include in the JWT
         return {
           id: String(existingUser.id),
           username: existingUser.username,
           email: existingUser.email,
-          image : existingUser.image || null
+          image: existingUser.image || null,
         };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user}) {
-      if(user){
-        return {
-          ...token, 
-          username : user.username
-        }
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.email = user.email
+        token.username = user.username;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
-      console.log(token, session)
       return {
-        ...session, 
-        user : {
+        ...session,
+        user: {
           ...session.user,
-          username : token.username
-        }
-      }
-    }
-  }
+          id : token.id,
+          email : token.email,
+          username: token.username,
+        },
+      };
+    },
+  },
 };
